@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Character Card</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+  <link rel="stylesheet" href="revolve.css" />
+</head>
+<body>
+  <div class="page">
+    <div class="stage">
+      <div class="about-wrap"><h1 class="about-title animate__animated animate__slideInDown" id="about-title">About Us</h1></div>
+      <div class="card prev" id="card-prev">
+        <img class="bg" alt="background" draggable="false" />
+        <img class="avatar" alt="avatar" draggable="false" />
+        <div class="text">
+          <div class="name"></div>
+          <div class="handle"></div>
+        </div>
+      </div>
+
+      <div class="card main" id="card-main">
+        <img class="bg" alt="background" draggable="false" />
+        <img class="avatar" alt="avatar" draggable="false" />
+        <div class="text">
+          <div class="name"></div>
+          <div class="handle"></div>
+        </div>
+      </div>
+
+      <div class="card next" id="card-next">
+        <img class="bg" alt="background" draggable="false" />
+        <img class="avatar" alt="avatar" draggable="false" />
+        <div class="text">
+          <div class="name"></div>
+          <div class="handle"></div>
+        </div>
+      </div>
+
+      <div class="card preload" id="card-preload">
+        <img class="bg" alt="background" draggable="false" />
+        <img class="avatar" alt="avatar" draggable="false" />
+        <div class="text">
+          <div class="name"></div>
+          <div class="handle"></div>
+        </div>
+      </div>
+
+      <button class="arrow left" id="arrow-left" aria-label="Previous">&#x2039;</button>
+      <button class="arrow right" id="arrow-right" aria-label="Next">&#x203A;</button>
+      <div class="ui-stack" id="ui-stack">
+        <div class="tracker swiper-pagination" id="tracker"></div>
+        <div class="controls" id="controls">
+          <div class="mode-switch">
+            <button class="mode-btn active" id="mode-revolve" aria-pressed="true"><img alt="revolve mode" /></button>
+            <button class="mode-btn" id="mode-list" aria-pressed="false"><img alt="list mode" /></button>
+          </div>
+          <button class="cta-purple" id="cta-purple">
+            <span class="handle" id="cta-handle"></span>
+            <img class="icon" id="cta-icon" alt="twitch" />
+          </button>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+  <div class="overlay hidden" id="sheet-overlay">
+    <div class="sheet-modal">
+      <button class="close" id="sheet-close" aria-label="Close">×</button>
+      <iframe id="sheet-frame" title="Character Sheet"></iframe>
+    </div>
+  </div>
+  <script src="revolveScripts.js"></script>
+</body>
+</html>

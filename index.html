@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game Title Screen</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/magic/1.1.0/magic.min.css" />
+<style>
+    html, body, * { user-select: none; -webkit-user-select: none; -ms-user-select: none; -moz-user-select: none; -webkit-tap-highlight-color: transparent; }
+    body {
+        margin: 0;
+        height: 100vh;
+        overflow: hidden;
+        font-family: 'Arial', sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        color: black; /* ALL TEXT DEFAULT BLACK */
+    }
+
+    @font-face {
+      font-family: 'Star Crush';
+      src: url('./assets/Star Crush.ttf') format('truetype');
+      font-display: swap;
+    }
+
+    /* --- Background Video --- */
+    .bg-video {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: blur(4px) brightness(55%);
+        z-index: -1;
+        pointer-events: none;
+    }
+
+    .banner {
+        position: relative;
+        background: rgba(255,255,255,0.45);
+        border-radius: 12px;
+        padding: 24px 28px;
+        box-shadow: 0 12px 30px rgba(0,0,0,.35);
+        animation: fadeIn 1.5s ease forwards;
+        opacity: 0;
+        transform: translateY(20px);
+        color: black;
+        display: grid;
+        place-items: center;
+        min-width: min(640px, 90vw);
+    }
+    .inner-box {
+        background: rgba(255,255,255,0.45);
+        border-radius: 12px;
+        padding: 24px;
+        width: min(560px, 86vw);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+    }
+
+    @keyframes fadeIn {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* --- Game title --- */
+    .title {
+        font-size: 55px;
+        font-weight: bold;
+        margin: 0;
+        text-shadow: none;
+        color: black; /* title black */
+        font-family: 'Star Crush', Arial, sans-serif;
+        text-align: center;
+        display: inline-block;
+        transform-origin: center center;
+    }
+    
+
+    /* --- Menu items --- */
+    .menu-item {
+        font-size: 28px;
+        margin: 6px 0;
+        cursor: pointer;
+        letter-spacing: 1px;
+        transition: transform .18s ease, text-decoration .18s ease;
+        position: relative;
+        color: black; /* menu items black */
+        text-align: center;
+        transform-origin: center center;
+        user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        -moz-user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Hover effect but still black text */
+    .menu-item:hover {
+        color: black;
+        transform: scale(1.08);
+        text-decoration: underline;
+    }
+    .menu-item:focus { outline: none; }
+
+    /* Audio controls bottom left */
+    #audioControls {
+        position: fixed;
+        left: 20px;
+        bottom: 20px;
+        z-index: 1000;
+        text-align: center;
+        color: black;
+    }
+
+    #muteBtn {
+        background: none;
+        border: none;
+        font-size: 28px;
+        cursor: pointer;
+        color: black; /* icon black */
+    }
+    button:focus { outline: none; }
+
+    #volumeSlider {
+        width: 100px;
+        margin-top: 5px;
+        display: none;
+    }
+
+    #audioControls:hover #volumeSlider {
+        display: block;
+    }
+    .tooltip{position:fixed;background:rgba(0,0,0,.9);color:#fff;padding:6px 10px;border-radius:6px;font-size:12px;white-space:nowrap;z-index:1000;pointer-events:none;opacity:0;transition:opacity .2s ease}
+    .tooltip.show{opacity:1}
+    #loadingOverlay{position:fixed;inset:0;background:linear-gradient(180deg,#0c0f12 0%,#111825 100%);z-index:200;display:grid;place-items:center}
+    #loadingOverlay.hidden{display:none}
+    .throbber{width:52px;height:52px;border-radius:50%;border:4px solid #20242a;border-top-color:#8fa1b3;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    /* animate.css duration control */
+    .animated-2s{--animate-duration:2s}
+    .captcha{display:none;width:160px;height:auto;image-rendering:auto}
+</style>
+</head>
+
+<body>
+
+<div id="loadingOverlay"><div class="throbber"></div><img id="captchaImg" class="captcha" alt="captcha" /></div>
+
+<video id="bgVideo" class="bg-video" src="./assets/loop.mp4" autoplay muted loop playsinline preload="auto"></video>
+
+<!-- Banner -->
+<div class="banner" id="banner">
+  <div class="inner-box">
+    <div class="title animate__animated animate__tada animate__infinite animated-2s">Gamunchin'</div>
+    <div class="menu-item" id="startBtn">START</div>
+    <div class="menu-item" id="creditsBtn">CREDITS</div>
+  </div>
+</div>
+
+<!-- ⭐ YOUR AUDIO ADDED HERE ⭐ -->
+<audio id="bgm" autoplay loop preload="auto">
+    Uw browser staat geen audio toe.
+</audio>
+
+<!-- Audio controls -->
+<div id="audioControls">
+    <button id="muteBtn">🔊</button>
+    <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5">
+</div>
+
+<script>
+const bgm = document.getElementById("bgm");
+const muteBtn = document.getElementById("muteBtn");
+const volumeSlider = document.getElementById("volumeSlider");
+const bgVideo=document.getElementById('bgVideo');
+const banner=document.getElementById('banner');
+const startBtn=document.getElementById('startBtn');
+const creditsBtn=document.getElementById('creditsBtn');
+
+let audioBase=0.1;
+let preloadComplete=false; let preloadPromise=null;
+const loadingOverlay=document.getElementById('loadingOverlay');
+const captchaImg=document.getElementById('captchaImg');
+
+let audioStarted = false;
+
+fetch('asset.json').then(r=>r.json()).then(a=>{
+    const title=a&&a.title||{};
+  if(title.audioBaseVolume!=null){ audioBase = Number(title.audioBaseVolume)||0.1; }
+  if(title.bgm){ bgm.src = title.bgm; }
+  if(title.bgVideo){ bgVideo.src = title.bgVideo; }
+  if(title.bannerOpacity!=null){ banner.style.background = `rgba(255,255,255,${Number(title.bannerOpacity)})`; }
+  const v = (parseFloat(volumeSlider.value)||0.5) * audioBase;
+  bgm.volume = v;
+  const events=a.events||{}; const eventAudio={}; Object.keys(events).forEach(k=>{ const v=events[k]||{}; if(v.src){ const au=new Audio(v.src); au.volume=typeof v.volume==='number'?v.volume:0.5; eventAudio[k]=au; } });
+  function playEvent(name){ const au=eventAudio[name]; if(au){ try{ au.currentTime=0; au.play().catch(()=>{}); }catch{} } }
+  startBtn.addEventListener('mouseenter',()=>playEvent('IndexHover'));
+  creditsBtn.addEventListener('mouseenter',()=>playEvent('IndexHover'));
+  if(a.title && a.title.captcha){ captchaImg.src = a.title.captcha; }
+}).catch(()=>{});
+bgm.addEventListener('loadedmetadata',()=>{ bgm.volume=(parseFloat(volumeSlider.value)||0.5)*audioBase; });
+  bgm.addEventListener('play',()=>{ bgm.volume=(parseFloat(volumeSlider.value)||0.5)*audioBase; });
+  function ensureBgmStarts(){
+    bgm.play().then(()=>{ audioStarted=true; }).catch(()=>{
+      bgm.muted=true;
+      bgm.play().then(()=>{ audioStarted=true; try{ bgm.muted=false; }catch{} }).catch(()=>{});
+    });
+  }
+  document.addEventListener('DOMContentLoaded', ensureBgmStarts);
+
+function startAudioOnce() {
+    if (!audioStarted) {
+        bgm.volume = (parseFloat(volumeSlider.value)||0.5) * audioBase;
+        bgm.play().catch(err => console.log("Audio blocked:", err));
+        audioStarted = true;
+    }
+}
+
+let captchaStageActive=false; let readyToStartAudio=false;
+document.addEventListener("click", ()=>{ if(readyToStartAudio){ startAudioOnce(); readyToStartAudio=false; } });
+
+muteBtn.addEventListener("click", () => {
+    startAudioOnce();
+    bgm.muted = !bgm.muted;
+    muteBtn.textContent = bgm.muted ? "🔇" : "🔊";
+});
+
+volumeSlider.addEventListener("input", () => {
+    startAudioOnce();
+    bgm.volume = (parseFloat(volumeSlider.value)||0.5) * audioBase;
+
+    if (volumeSlider.value == 0) {
+        bgm.muted = true;
+        muteBtn.textContent = "🔇";
+    } else {
+        bgm.muted = false;
+        muteBtn.textContent = "🔊";
+    }
+});
+// Volume tooltip
+(function(){
+  const tip=document.createElement('div'); tip.className='tooltip'; document.body.appendChild(tip);
+  function showTip(){
+    const pct=Math.round((parseFloat(volumeSlider.value)||0)*100);
+    tip.textContent=`Volume: ${pct}%`;
+    const rect=volumeSlider.getBoundingClientRect();
+    tip.style.left=Math.round(rect.left + rect.width/2 - tip.offsetWidth/2)+"px";
+    tip.style.top=Math.round(rect.top - 28)+"px";
+    tip.classList.add('show');
+  }
+  function hideTip(){ tip.classList.remove('show'); }
+  document.getElementById('audioControls').addEventListener('mouseenter',showTip);
+  document.getElementById('audioControls').addEventListener('mouseleave',hideTip);
+  volumeSlider.addEventListener('input',()=>{ if(tip.classList.contains('show')){ showTip(); } });
+})();
+
+function preloadAssets(){
+  if(preloadPromise) return preloadPromise;
+  const tasks=[];
+  tasks.push(new Promise(resolve=>{
+    const f=new FontFace('Star Crush', 'url(./assets/Star Crush.ttf)');
+    f.load().then(ff=>{document.fonts.add(ff); resolve();}).catch(()=>resolve());
+  }));
+  tasks.push(new Promise(resolve=>{
+    if(!bgVideo) return resolve();
+    if(bgVideo.readyState>=3) return resolve();
+    const onLoaded=()=>{bgVideo.removeEventListener('loadeddata', onLoaded); resolve();};
+    bgVideo.addEventListener('loadeddata', onLoaded);
+    bgVideo.load();
+  }));
+  tasks.push(new Promise(resolve=>{ const a=new Audio(); a.src=bgm.src||''; a.preload='auto'; a.addEventListener('canplaythrough',()=>resolve(),{once:true}); a.addEventListener('error',()=>resolve(),{once:true}); a.load(); }));
+  tasks.push(new Promise(res=>{ document.fonts&&document.fonts.ready?document.fonts.ready.then(()=>res()).catch(()=>res()):res(); }));
+  tasks.push(new Promise(resolve=>{ const link=document.querySelector('link[href*="animate.min.css"]'); if(!link) return resolve(); if(link.sheet) return resolve(); link.addEventListener('load',()=>resolve(),{once:true}); link.addEventListener('error',()=>resolve(),{once:true}); }));
+  tasks.push(new Promise(resolve=>{ if(!bgm) return resolve(); if(bgm.readyState>=3) return resolve(); const onReady=()=>{ bgm.removeEventListener('canplaythrough', onReady); resolve(); }; bgm.addEventListener('canplaythrough', onReady, {once:true}); bgm.load&&bgm.load(); }));
+  tasks.push(fetch('asset.json').then(r=>r.json()).then(a=>{
+    const urls=[];
+    const pushUrl=(u)=>{ if(u && typeof u==='string'){ urls.push(u); } };
+    const rev=a.revolve||{};
+    pushUrl(rev.defaultBg); const sounds=rev.sounds||{}; Object.values(sounds).forEach(pushUrl);
+    const icons=(rev.modeIcons||{}); Object.values(icons).forEach(pushUrl);
+    const title=a.title||{}; pushUrl(title.bgm); pushUrl(title.bgVideo);
+    const imgPromises=urls.filter(u=>u.endsWith('.png')||u.endsWith('.jpg')||u.endsWith('.jpeg')||u.includes('picsum')).map(u=>new Promise(res=>{ const img=new Image(); img.onload=()=>res(); img.onerror=()=>res(); img.src=u; }));
+    const audioPromises=urls.filter(u=>u.endsWith('.mp3')||u.endsWith('.wav')||u.endsWith('.ogg')).map(u=>new Promise(res=>{ const aa=new Audio(); aa.src=u; aa.preload='auto'; aa.addEventListener('canplaythrough',()=>res(),{once:true}); aa.addEventListener('error',()=>res(),{once:true}); aa.load(); }));
+    return Promise.allSettled([...imgPromises, ...audioPromises]);
+  }).catch(()=>{}));
+  preloadPromise=Promise.allSettled(tasks).then(()=>{preloadComplete=true});
+  return preloadPromise;
+}
+
+function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
+function stopTitleLoop(el){
+  return new Promise(resolve=>{
+    if(!el) return resolve();
+    const inf=el.classList.contains('animate__infinite');
+    if(!inf) return resolve();
+    const onIter=()=>{ el.removeEventListener('animationiteration', onIter); el.classList.remove('animate__infinite'); resolve(); };
+    el.addEventListener('animationiteration', onIter, {once:true});
+  });
+}
+startBtn.setAttribute('tabindex','-1');
+startBtn.style.outline='none';
+startBtn.style.userSelect='none';
+startBtn.addEventListener('focus',()=>{ startBtn.blur(); });
+startBtn.addEventListener('mousedown',e=>{ e.preventDefault(); startBtn.blur(); });
+startBtn.addEventListener('pointerdown',e=>{ e.preventDefault(); startBtn.blur(); });
+startBtn.addEventListener('click',async(e)=>{
+  e.stopPropagation();
+  (function(){ try{ const a=document.querySelector('#startBtn')?true:false; }catch{} })();
+  (function(){ try{ const a=document.querySelector('#creditsBtn')?true:false; }catch{} })();
+  try{ const events=(await fetch('asset.json').then(r=>r.json()).catch(()=>({}))).events||{}; const ea=(function(){ const m={}; Object.keys(events).forEach(k=>{ const v=events[k]||{}; if(v.src){ const au=new Audio(v.src); au.volume=typeof v.volume==='number'?v.volume:0.5; m[k]=au; } }); return m; })(); (function(){ const au=ea['IndexClick']; if(au){ au.currentTime=0; au.play().catch(()=>{}); } })(); }catch{}
+  try{
+    startBtn.classList.remove('magictime','spaceOutUp');
+    startBtn.offsetHeight;
+    startBtn.classList.add('magictime','spaceOutUp');
+    await new Promise(res=>{ startBtn.addEventListener('animationend',()=>res(),{once:true}); });
+  }catch{}
+  const title=document.querySelector('.title');
+  await stopTitleLoop(title);
+  await delay(100);
+  if(title){
+    title.classList.remove('animate__tada');
+    title.classList.add('animate__animated','animate__hinge');
+    await new Promise(res=>{ title.addEventListener('animationend',()=>res(),{once:true}); });
+  }
+  await delay(100);
+  if(title){ title.style.transition='opacity .2s ease'; title.style.opacity='0'; }
+  await delay(200);
+  try{
+    const res=await fetch('data.json'); const raw=await res.json(); const data=raw.data||raw;
+    const ages={};
+    (data.characters||[]).forEach(c=>{
+      const b=String(c.birthdate||'');
+      if(!b) return;
+      const bd=new Date(b);
+      if(isNaN(bd.getTime())) return;
+      const now=new Date();
+      let y=now.getFullYear()-bd.getFullYear();
+      let m=now.getMonth()-bd.getMonth();
+      let d=now.getDate()-bd.getDate();
+      if(d<0){ const pm=new Date(now.getFullYear(), now.getMonth(), 0).getDate(); d+=pm; m-=1; }
+      while(m<0){ m+=12; y-=1; }
+      if(y<0){ y=0; m=0; d=0; }
+      ages[c.id]={years:y, months:m, days:d};
+    });
+    sessionStorage.setItem('characterAges', JSON.stringify(ages));
+  }catch{}
+  window.location.href='./revolve.html';
+});
+creditsBtn.addEventListener('mousedown',e=>e.preventDefault());
+// credits behavior (placeholder modal)
+creditsBtn.addEventListener('click',()=>{
+  (async function(){ try{ const events=(await fetch('asset.json').then(r=>r.json()).catch(()=>({}))).events||{}; const v=events['IndexClick']||{}; if(v.src){ const au=new Audio(v.src); au.volume=typeof v.volume==='number'?v.volume:0.5; au.currentTime=0; au.play().catch(()=>{}); } }catch{} })();
+  const overlay=document.createElement('div'); overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;display:grid;place-items:center';
+  const box=document.createElement('div'); box.style.cssText='background:#fff;color:#000;padding:20px 24px;border-radius:10px;min-width:260px;text-align:center;';
+  box.textContent='Credits coming soon'; overlay.appendChild(box);
+  overlay.addEventListener('click',()=>{ document.body.removeChild(overlay); },{once:true});
+  document.body.appendChild(overlay);
+});
+
+preloadAssets().then(()=>{ loadingOverlay.classList.add('hidden'); });
+
+// Captcha stage after preload
+preloadAssets().then(()=>{
+  const th=document.querySelector('#loadingOverlay .throbber');
+  if(th){ th.style.display='none'; }
+  if(captchaImg){ captchaImg.style.display='block'; }
+  captchaStageActive=true;
+});
+
+// Handle captcha click flow
+document.addEventListener('click', async()=>{
+  if(!captchaStageActive) return;
+  try{
+    if(captchaImg){
+      captchaImg.classList.remove('magictime','spaceOutUp');
+      captchaImg.offsetHeight;
+      captchaImg.classList.add('magictime','spaceOutUp');
+      await new Promise(res=>{ captchaImg.addEventListener('animationend',()=>res(),{once:true}); });
+    }
+    if(bgVideo){
+      bgVideo.classList.remove('magictime','perspectiveUp');
+      bgVideo.offsetHeight;
+      bgVideo.classList.add('magictime','perspectiveUp');
+      await new Promise(res=>{ bgVideo.addEventListener('animationend',()=>res(),{once:true}); });
+    }
+  }catch{}
+  readyToStartAudio=true;
+  startAudioOnce();
+  captchaStageActive=false;
+  loadingOverlay.classList.add('hidden');
+});
+
+
+</script>
+
+
+</body>
+</html>

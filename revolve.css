@@ -1,0 +1,118 @@
+:root{--card-w:180px;--card-h:260px;--radius:18px;--card-w-sm:calc(var(--card-w)*0.7);--card-h-sm:calc(var(--card-h)*0.7);--scale-sm:.7;--arrow-gap-left:calc(var(--card-w)*1.5);--arrow-gap-right:calc(var(--card-w)*1.5);--hl:#7ec8ff;--phase1-dur:250ms;--phase2-dur:360ms;--center-offset:0px;--result-dur:220ms;--scanline-dur:3s;--main-opacity:1;--prev-opacity:.85;--next-opacity:.85;--main-offset-px:0px;--prev-offset-factor:.72;--next-offset-factor:.72;--main-tilt-x:0deg;--main-tilt-y:0deg;--main-tilt-z:0deg;--prev-tilt-x:0deg;--prev-tilt-y:0deg;--prev-tilt-z:-60deg;--next-tilt-x:0deg;--next-tilt-y:0deg;--next-tilt-z:60deg;--prev-scale:.93;--next-scale:.93;--z-main:10;--z-prev:2;--z-next:2;--mode-btn-size:48px;--mode-gap:20px;--icon-size:24px;--mode-fill:#fb7575;--mode-border:#fff}
+.page, .page *{box-sizing:border-box}
+html, body, .page{user-select:none;-webkit-user-select:none;-ms-user-select:none;-moz-user-select:none}
+html,body{height:100%}
+body{margin:0;background:#0c0f12;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;position:relative;overflow:hidden}
+body::after{content:"";position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:120%;height:300px;background:radial-gradient(ellipse at center bottom, rgba(255,255,255,0.08) 0%, transparent 70%);border-radius:50% 50% 0 0;z-index:-1;pointer-events:none}
+.page{min-height:100vh;display:grid;place-items:center}
+.about{margin-bottom:14px;font-weight:700;font-size:1.2rem;color:#fff}
+.stage{position:relative;display:grid;place-items:center;min-height:var(--card-h);cursor:grab;transform:translateY(var(--center-offset));perspective:900px;transform-style:preserve-3d}
+.about-wrap{position:absolute;left:50%;transform:translateX(-50%);top:calc(50% - (var(--card-h)/2) - 75px + var(--center-offset));z-index:6;pointer-events:none}
+.about-title{position:relative;color:#fff;margin:0;font-size:4rem;white-space:nowrap}
+.card{position:absolute;width:var(--card-w);height:var(--card-h);border-radius:var(--radius);overflow:hidden;background:#111;box-shadow:0 12px 30px rgba(0,0,0,.45);transition:transform .35s ease, filter .35s ease, opacity .35s ease, outline-color .18s ease, outline-width .18s ease}
+.card::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--hl),transparent);animation:scanline var(--scanline-dur) linear infinite;pointer-events:none;box-shadow:0 0 10px rgba(126,200,255,.5)}
+.card::after{content:"";position:absolute;inset:auto 0 0 0;height:40%;background:linear-gradient(to top,rgba(0,0,0,.7),rgba(0,0,0,0));pointer-events:none;transform:translateY(20px)}
+.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(1.05) contrast(1.02);pointer-events:none;user-select:none}
+.avatar{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:72%;height:auto;object-fit:contain;user-select:none;-webkit-user-drag:none;pointer-events:none}
+.text{position:absolute;left:16px;bottom:16px;display:flex;flex-direction:column;gap:4px;z-index:2}
+.name{font-weight:700;font-size:1.15rem;letter-spacing:.2px;user-select:none}
+.handle{opacity:.7;font-size:.95rem}
+.no-handles .card .handle{display:none}
+.card.main{z-index:var(--z-main);outline:0 solid var(--hl);opacity:var(--main-opacity);transform:translateX(var(--main-offset-px)) rotateX(var(--main-tilt-x)) rotateY(var(--main-tilt-y)) rotateZ(var(--main-tilt-z))}
+.card.main:hover{transform:scale(1.03);outline-width:2px}
+
+.card.prev,.card.next{width:var(--card-w-sm);height:var(--card-h-sm);filter:blur(2px);pointer-events:none}
+.card.prev{opacity:var(--prev-opacity);transform:translateX(calc(-1 * var(--card-w) * var(--prev-offset-factor))) rotateX(var(--prev-tilt-x)) rotateY(var(--prev-tilt-y)) rotateZ(var(--prev-tilt-z));z-index:var(--z-prev)}
+.card.next{opacity:var(--next-opacity);transform:translateX(calc(var(--card-w) * var(--next-offset-factor))) rotateX(var(--next-tilt-x)) rotateY(var(--next-tilt-y)) rotateZ(var(--next-tilt-z));z-index:var(--z-next)}
+
+.card.preload{pointer-events:none;opacity:.5;filter:blur(2px);z-index:1}
+.stage.preload-right .card.preload{transform:translateX(calc(var(--card-w) * var(--next-offset-factor))) scale(0)}
+.stage.preload-left .card.preload{transform:translateX(calc(-1 * var(--card-w) * var(--prev-offset-factor))) scale(0)}
+
+.arrow{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.12);color:#fff;border:none;border-radius:999px;width:clamp(32px, calc(var(--card-w)*0.14), 56px);height:clamp(32px, calc(var(--card-w)*0.14), 56px);display:grid;place-items:center;backdrop-filter:blur(6px);cursor:pointer;z-index:4;font-size:clamp(20px, calc(var(--card-w)*0.08), 32px);user-select:none;-webkit-tap-highlight-color:transparent}
+.arrow:focus{outline:none}
+.arrow.left{left:calc(50% - var(--arrow-gap-left))}
+.arrow.right{left:calc(50% + var(--arrow-gap-right))}
+.arrow:hover{background:rgba(255,255,255,.18)}
+
+.ui-stack{position:absolute;left:50%;top:calc(50% + (var(--card-h)/2) + var(--bubble-gap,20px));transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:20px}
+.tracker{position:relative;transform:none;display:flex;gap:10px;justify-content:center;will-change:transform}
+.bubble-slot{position:relative;width:var(--bubble-size,13px);height:var(--bubble-size,13px);display:grid;place-items:center}
+.bubble{background:rgba(255,255,255,.35);height:var(--bubble-size,13px);width:var(--bubble-size,13px);border-radius:50%;opacity:var(--bubble-opacity, .9);display:grid;place-items:center;transition:opacity var(--phase2-dur) ease, transform var(--phase2-dur) cubic-bezier(.34,1.56,.64,1);will-change:transform,opacity;z-index:1}
+.bubble-glow{position:absolute;inset:0;background:#fff;border-radius:50%;transform:scale(1.15);opacity:1;transition:opacity var(--glow-dur, 220ms) ease, transform var(--glow-dur, 220ms) cubic-bezier(.34,1.56,.64,1);z-index:2;pointer-events:none;box-shadow:0 0 10px rgba(255,255,255,.85),0 0 18px rgba(126,200,255,.5)}
+.bubble.despawn{transform:scale(0);opacity:0}
+.bubble.spawn{transform:scale(0);opacity:0}
+.bubble.spawn.spawn-in{transform:scale(1);opacity:var(--bubble-opacity, .9)}
+.tracker.moving-left .bubble-slot.slot-b{transform:translateX(calc(-1 * (var(--bubble-size,13px) + 10px)))}
+.tracker.moving-left .bubble-slot.slot-c{transform:translateX(calc(-1 * (var(--bubble-size,13px) + 10px)))}
+.tracker.moving-right .bubble-slot.slot-a{transform:translateX(calc(1 * (var(--bubble-size,13px) + 10px)))}
+.tracker.moving-right .bubble-slot.slot-b{transform:translateX(calc(1 * (var(--bubble-size,13px) + 10px)))}
+.tracker.moving-left .bubble-slot, .tracker.moving-right .bubble-slot{transition:transform var(--phase2-dur) cubic-bezier(.34,1.56,.64,1);will-change:transform}
+
+.stage.dragging, .stage.dragging *{user-select:none}
+.stage.dragging{cursor:grabbing}
+
+.stage.phase1 .card{transition:transform var(--phase1-dur) cubic-bezier(.34,1.56,.64,1), filter var(--phase1-dur) ease, opacity var(--phase1-dur) ease}
+.stage.phase2 .card{transition:transform var(--phase2-dur) cubic-bezier(.34,1.56,.64,1), filter var(--phase2-dur) ease, opacity var(--phase2-dur) ease}
+.stage.finalize .card{transition:none!important}
+/* allow text transitions during finalize */
+
+/* Keep name/handle size steady when main card shrinks */
+.stage.size-left .card.main .text,
+.stage.move-left .card.main .text,
+.stage.size-right .card.main .text,
+.stage.move-right .card.main .text{transform:scale(calc(1 / var(--scale-sm)));transform-origin:left bottom}
+.stage.phase1 .card.main .text{transition:transform var(--phase1-dur) cubic-bezier(.34,1.56,.64,1)}
+.stage.phase2 .card.main .text{transition:transform var(--phase2-dur) cubic-bezier(.34,1.56,.64,1)}
+.stage.size-left .card.main .text, .stage.size-right .card.main .text{transition:opacity var(--phase1-dur) ease}
+.stage.move-left .card.next .text, .stage.move-right .card.prev .text{opacity:1;transition:opacity var(--phase2-dur) ease}
+.card.prev .text, .card.next .text{opacity:.85;transition:opacity var(--phase2-dur) ease}
+.stage.finalize .text{opacity:1;transition:opacity var(--phase2-dur) ease}
+.card.prev .text, .card.next .text{transform:scale(.92);transform-origin:left bottom;transition:transform var(--phase2-dur) ease}
+.stage.size-left .card.prev{transform:translateX(calc(-1 * var(--card-w) * var(--prev-offset-factor))) scale(0) rotateX(var(--prev-tilt-x)) rotateY(var(--prev-tilt-y)) rotateZ(var(--prev-tilt-z));opacity:0;filter:blur(2px);z-index:var(--z-prev)}
+.stage.size-left .card.main{transform:translateX(var(--main-offset-px)) scale(var(--scale-sm)) rotateX(var(--main-tilt-x)) rotateY(var(--main-tilt-y)) rotateZ(var(--main-tilt-z));z-index:var(--z-main)}
+.stage.size-left .card.next{transform:translateX(calc(var(--card-w) * var(--next-offset-factor))) scale(var(--next-scale)) rotateX(var(--next-tilt-x)) rotateY(var(--next-tilt-y)) rotateZ(var(--next-tilt-z));filter:none;opacity:1;z-index:var(--z-next)}
+.stage.size-left .card.preload{transform:translateX(calc(var(--card-w) * var(--next-offset-factor))) scale(var(--scale-sm)) rotateX(var(--next-tilt-x)) rotateY(var(--next-tilt-y)) rotateZ(var(--next-tilt-z));filter:blur(2px);opacity:.85;z-index:2}
+.stage.move-left .card.main{transform:translateX(calc(-1 * var(--card-w) * var(--prev-offset-factor))) scale(var(--scale-sm)) rotateX(var(--main-tilt-x)) rotateY(var(--main-tilt-y)) rotateZ(var(--main-tilt-z))}
+.stage.move-left .card.next{transform:translateX(0) scale(1) rotateX(0deg) rotateY(0deg) rotateZ(0deg)}
+.stage.move-left .card.prev{transform:translateX(calc(-1 * var(--card-w) * var(--prev-offset-factor))) scale(0) rotateX(var(--prev-tilt-x)) rotateY(var(--prev-tilt-y)) rotateZ(var(--prev-tilt-z))}
+.stage.move-left .card.preload{transform:translateX(calc(var(--card-w) * var(--next-offset-factor))) scale(var(--scale-sm)) rotateX(var(--next-tilt-x)) rotateY(var(--next-tilt-y)) rotateZ(var(--next-tilt-z))}
+
+.stage.size-right .card.next{transform:translateX(calc(var(--card-w) * var(--next-offset-factor))) scale(0) rotateX(var(--next-tilt-x)) rotateY(var(--next-tilt-y)) rotateZ(var(--next-tilt-z));opacity:0;filter:blur(2px);z-index:var(--z-next)}
+.stage.size-right .card.main{transform:translateX(var(--main-offset-px)) scale(var(--scale-sm)) rotateX(var(--main-tilt-x)) rotateY(var(--main-tilt-y)) rotateZ(var(--main-tilt-z));z-index:var(--z-main)}
+.stage.size-right .card.prev{transform:translateX(calc(-1 * var(--card-w) * var(--prev-offset-factor))) scale(var(--prev-scale)) rotateX(var(--prev-tilt-x)) rotateY(var(--prev-tilt-y)) rotateZ(var(--prev-tilt-z));filter:none;opacity:1;z-index:var(--z-prev)}
+.stage.size-right .card.preload{transform:translateX(calc(-1 * var(--card-w) * var(--prev-offset-factor))) scale(var(--scale-sm)) rotateX(var(--prev-tilt-x)) rotateY(var(--prev-tilt-y)) rotateZ(var(--prev-tilt-z));filter:blur(2px);opacity:.85;z-index:2}
+.stage.move-right .card.main{transform:translateX(calc(var(--card-w) * var(--next-offset-factor))) scale(var(--scale-sm)) rotateX(var(--main-tilt-x)) rotateY(var(--main-tilt-y)) rotateZ(var(--main-tilt-z))}
+.stage.move-right .card.prev{transform:translateX(0) scale(1) rotateX(0deg) rotateY(0deg) rotateZ(0deg)}
+.stage.move-right .card.next{transform:translateX(calc(var(--card-w) * var(--next-offset-factor))) scale(0) rotateX(var(--next-tilt-x)) rotateY(var(--next-tilt-y)) rotateZ(var(--next-tilt-z))}
+.stage.move-right .card.preload{transform:translateX(calc(-1 * var(--card-w) * var(--prev-offset-factor))) scale(var(--scale-sm)) rotateX(var(--prev-tilt-x)) rotateY(var(--prev-tilt-y)) rotateZ(var(--prev-tilt-z))}
+
+@media (max-width:768px){:root{--card-w:68vw;--card-h:calc(68vw*1.35);--card-w-sm:calc(var(--card-w)*0.7);--card-h-sm:calc(var(--card-h)*0.7)}}
+@media (max-width:420px){:root{--card-w:74vw;--card-h:calc(74vw*1.35);--card-w-sm:calc(var(--card-w)*0.7);--card-h-sm:calc(var(--card-h)*0.7)}}
+
+@keyframes growBounce{0%{transform:translateX(0) scale(0.93)}70%{transform:translateX(0) scale(1.06)}100%{transform:translateX(0) scale(1)}}
+.stage.move-left .card.next{animation:growBounce var(--phase2-dur) cubic-bezier(.17,.67,.36,1.31)}
+.stage.move-right .card.prev{animation:growBounce var(--phase2-dur) cubic-bezier(.17,.67,.36,1.31)}
+.card.main.settle{animation:settleFade var(--result-dur) ease}
+@keyframes settleFade{0%{transform:scale(1.02)}100%{transform:scale(1)}}
+@keyframes scanline{0%{transform:translateY(0)}100%{transform:translateY(var(--card-h))}}
+.controls{position:relative;transform:none;display:grid;place-items:center;gap:20px}
+.mode-switch{display:flex;justify-content:center;gap:var(--mode-gap)}
+.mode-btn{width:var(--mode-btn-size);height:var(--mode-btn-size);border-radius:50%;border:2px solid var(--mode-border);background:var(--mode-fill);display:grid;place-items:center;padding:0;cursor:pointer;transition:transform .18s ease, opacity .18s ease}
+.mode-btn img{width:var(--icon-size);height:var(--icon-size)}
+.mode-btn:not(.active){opacity:.65}
+.mode-btn:hover{transform:translateY(-2px) scale(1.05)}
+.mode-btn:not(.active):hover{opacity:.85}
+.mode-btn.active{outline:2px solid var(--hl)}
+.cta-purple{display:flex;align-items:center;justify-content:space-between;gap:0;padding:0 12px;min-width:0;width:max-content;height:var(--mode-btn-size);background:#9146FF;color:#fff;border-radius:10px;border:none;cursor:pointer;font-weight:700;letter-spacing:.3px}
+.cta-purple:hover{transform:translateY(-2px) scale(1.03);transition:transform .18s ease}
+.cta-purple .icon{width:var(--icon-size);height:var(--icon-size);flex:0 0 var(--icon-size);margin-left:8px}
+.cta-purple .handle{font-weight:600;white-space:nowrap;min-width:0;font-size:calc(var(--icon-size) - 4px);line-height:1;margin-right:8px}
+
+/* Modal overlay */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:grid;place-items:center;z-index:100}
+.overlay.hidden{display:none}
+.sheet-modal{position:relative;width:min(900px, 96vw);height:min(680px, 92vh);background:#0e1216;border-radius:12px;box-shadow:0 18px 40px rgba(0,0,0,.6);overflow:hidden;display:grid}
+.sheet-modal .close{position:absolute;top:10px;right:10px;border:none;background:rgba(255,255,255,.15);color:#fff;border-radius:999px;width:36px;height:36px;cursor:pointer;font-size:22px}
+#sheet-frame{border:0;width:100%;height:100%;background:#111}
+.page.modal-blur .stage{filter:blur(4px) brightness(.6)}

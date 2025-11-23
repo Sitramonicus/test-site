@@ -1,0 +1,254 @@
+{ "data": {
+  "defaultBg": "https://fastly.picsum.photos/id/30/1280/901.jpg?hmac=A_hpFyEavMBB7Dsmmp53kPXKmatwM05MUDatlWSgATE",
+  "characters": [
+    {
+      "id": "aishaah",
+      "name": "Aishaah",
+      "handle": "@aishaah",
+      "birthdate": "2009-11-22",
+      "strength": 54,
+      "dexterity": 54,
+      "wisdom": 54,
+      "intelligence": 54,
+      "constitution": 54,
+      "charisma": 54,
+      "desc": [
+        {"type": "p", "content": "A concise biography describing this character."},
+        {"type": "b", "content": "Brave and curious."}
+      ],
+      "items": ["item1", "item2"],
+      "socials": [
+        {"name": "Instagram", "handle": "Placeholder", "link": "https://www.google.com"},
+        {"name": "YouTube",   "handle": "Placeholder", "link": "https://www.google.com"},
+        {"name": "Reddit",    "handle": "Placeholder", "link": "https://www.google.com"},
+        {"name": "Discord",   "handle": "Placeholder", "link": "https://www.google.com"}
+      ],
+      "bg": "https://fastly.picsum.photos/id/517/200/300.jpg?hmac=xpkz9Xo5Fd9o6IumOFou6GwHqhMUTxxhyYfNiawb1Qk",
+      "avatar": "./assets/phavatar.png",
+      "chibi": "https://via.placeholder.com/120x120/000000/ffffff?text=Chibi+A"
+    },
+    {
+      "id": "ethan",
+      "name": "Ethan",
+      "handle": "@ethan",
+      "birthdate": "2009-03-22",
+      "strength": 46,
+      "dexterity": 61,
+      "wisdom": 52,
+      "intelligence": 64,
+      "constitution": 50,
+      "charisma": 58,
+      "desc": [
+        {"type": "p", "content": "Ethan is pragmatic, with an eye for craft."},
+        {"type": "b", "content": "Crafts meticulously."}
+      ],
+      "items": ["item3"],
+      "socials": [
+        {"name": "X",         "handle": "Placeholder", "link": "https://www.google.com"},
+        {"name": "LinkedIn",  "handle": "Placeholder", "link": "https://www.google.com"},
+        {"name": "Pinterest", "handle": "Placeholder", "link": "https://www.google.com"},
+        {"name": "Telegram",  "handle": "Placeholder", "link": "https://www.google.com"}
+      ],
+      "bg": "",
+      "avatar": "./assets/phavatar.png",
+      "chibi": "https://via.placeholder.com/120x120/000000/ffffff?text=Chibi+E"
+    },
+    {
+      "id": "hannah",
+      "name": "Hannah",
+      "handle": "@hannah",
+      "birthdate": "2010-11-22",
+      "strength": 64,
+      "dexterity": 44,
+      "wisdom": 50,
+      "intelligence": 54,
+      "constitution": 60,
+      "charisma": 62,
+      "desc": [
+        {"type": "p", "content": "Hannah favours quiet complexity."},
+        {"type": "b", "content": "Loves layered designs."}
+      ],
+      "items": [],
+      "socials": [
+        {"name": "TikTok",    "handle": "Placeholder", "link": "https://www.google.com"},
+        {"name": "Instagram", "handle": "Placeholder", "link": "https://www.google.com"},
+        {"name": "Snapchat",  "handle": "Placeholder", "link": "https://www.google.com"},
+        {"name": "YouTube",   "handle": "Placeholder", "link": "https://www.google.com"}
+      ],
+      "bg": "https://fastly.picsum.photos/id/507/200/300.jpg?hmac=v0NKvUrOWTKZuZFmMlLN_7-RdRgeF-qFLeBGXpufxgg",
+      "avatar": "./assets/phavatar.png",
+      "chibi": "./assets/phavatar.png"
+    }
+    ,
+    {
+      "id": "elweiszha",
+      "name": "Elweiszha",
+      "handle": "@elweiszha",
+      "desc": [
+        {"type": "p", "content": "Placeholder"}
+      ],
+      "items": [],
+      "socials": [
+        {"name": "Facebook",  "handle": "Placeholder", "link": "https://www.google.com"},
+        {"name": "Tumblr",    "handle": "Placeholder", "link": "https://www.google.com"},
+        {"name": "Flickr",    "handle": "Placeholder", "link": "https://www.google.com"},
+        {"name": "Vimeo",     "handle": "Placeholder", "link": "https://www.google.com"}
+      ],
+      "bg": "",
+      "avatar": "./assets/phavatar.png",
+      "chibi": "./assets/phavatar.png"
+    }
+    ,
+    {
+      "id": "jimuel",
+      "name": "Jimuel",
+      "handle": "@jimuel",
+      "desc": [
+        {"type": "p", "content": "Placeholder"}
+      ],
+      "items": [],
+      "socials": [
+        {"name": "Reddit",    "handle": "Placeholder", "link": "https://www.google.com"},
+        {"name": "Discord",   "handle": "Placeholder", "link": "https://www.google.com"},
+        {"name": "YouTube",   "handle": "Placeholder", "link": "https://www.google.com"},
+        {"name": "Instagram", "handle": "Placeholder", "link": "https://www.google.com"}
+      ],
+      "bg": "",
+      "avatar": "./assets/phavatar.png",
+      "chibi": "https://via.placeholder.com/120x120/000000/ffffff?text=Chibi+J"
+    }
+    ,
+    {
+      "id": "kyle",
+      "name": "Kyle",
+      "handle": "@kyle",
+      "desc": [
+        {"type": "p", "content": "Placeholder"}
+      ],
+      "items": [],
+      "socials": [
+        {"name": "LinkedIn",  "handle": "Placeholder", "link": "https://www.google.com"},
+        {"name": "Instagram", "handle": "Placeholder", "link": "https://www.google.com"},
+        {"name": "Pinterest", "handle": "Placeholder", "link": "https://www.google.com"},
+        {"name": "X",         "handle": "Placeholder", "link": "https://www.google.com"}
+      ],
+      "bg": "",
+      "avatar": "./assets/phavatar.png",
+      "chibi": "./assets/phavatar.png"
+    }
+    ,
+    {
+      "id": "mary",
+      "name": "Mary",
+      "handle": "@mary",
+      "desc": [
+        {"type": "p", "content": "Placeholder"}
+      ],
+      "items": [],
+      "socials": [
+        {"name": "Facebook",  "handle": "Placeholder", "link": "https://www.google.com"},
+        {"name": "Instagram", "handle": "Placeholder", "link": "https://www.google.com"},
+        {"name": "Pinterest", "handle": "Placeholder", "link": "https://www.google.com"},
+        {"name": "TikTok",    "handle": "Placeholder", "link": "https://www.google.com"}
+      ],
+      "bg": "",
+      "avatar": "./assets/phavatar.png",
+      "chibi": "./assets/phavatar.png"
+    }
+  ],
+  "items": [
+    {"id": "item1", "title": "Project Alpha", "desc": "Exploratory piece.", "image": "./assets/tempItem.png", "links": ["https://www.youtube.com"]},
+    {"id": "item2", "title": "Commission B", "desc": "Small commission.", "image": "./assets/tempItem.png", "links": []},
+    {"id": "item3", "title": "Portfolio One", "desc": "Early work.", "image": "./assets/tempItem.png", "links": []}
+  ],
+  "dialogues": [
+    {"id": "intro", "name": "Guide", "lines": ["Welcome — select a character to view the sheet.", "Use drag or the arrows to revolve."]}
+  ]
+  ,
+  "loading": {
+    "messages": [
+      "Preparing assets...",
+      "Warming up shaders...",
+      "Fetching data...",
+      "Finalizing setup..."
+    ],
+    "cycleMs": 1500
+  }
+  
+  },
+  "settings": {
+    "stat_visibility": true,
+    "socials": {
+      "diameter": {
+        "base": {"value": 1.3, "unit": "scale"},
+        "min": {"value": 0, "unit": "auto"},
+        "compatSmoothing": {
+          "orbSizeFactor": 0.2,
+          "centerGapPx": 70,
+          "bannerMaxHeightPx": 48
+        }
+      },
+      "rotation": {
+        "revolutionMs": 32000
+      },
+      "banner": {
+        "gapPx": 12,
+        "marginPx": 12,
+        "verticalOffsetPx": 0,
+        "pointer": {
+          "sizePx": 12,
+          "offsetPx": -6,
+          "radiusPx": 2
+        }
+      }
+    },
+    "page": {
+      "siteBgColor": "#0c0f12",
+      "centerOffsetPx": -30,
+      "arrowGapLeftPercent": 35,
+      "arrowGapRightPercent": 13,
+      "arrowGapBothPercent": 85
+    },
+    "cards": {
+      "switchAnimation": 1,
+      "highlightColor": "#7ec8ff",
+      "animationSpeedPercent": 100,
+      "showHandles": 0,
+      "main": {
+        "opacity": 1,
+        "centerOffsetPx": 0,
+        "zIndex": 10,
+        "tilt": {"xDeg": 0, "yDeg": 0, "zDeg": 0},
+        "scaleSm": 0.6
+      },
+      "prev": {
+        "opacity": 0.85,
+        "offsetFactor": 0.72,
+        "zIndex": 2,
+        "tilt": {"xDeg": 0, "yDeg": 20, "zDeg": 0},
+        "scale": 0.93
+      },
+      "next": {
+        "opacity": 0.85,
+        "offsetFactor": 0.72,
+        "zIndex": 2,
+        "tilt": {"xDeg": 0, "yDeg": -20, "zDeg": 0},
+      "scale": 0.93
+      }
+    },
+    "bubble": {
+      "gapPx": 30
+    },
+    "twitch": {
+      "icon": "./assets/twitch.png",
+      "handle": "@gamunchin",
+      "link": "https://twitch.tv/gamunchin"
+    },
+    "controls": {
+      "switchButtons": {
+        "fillColor": "#fb7575",
+        "borderColor": "#ffffff"
+      }
+    }
+  }
+}

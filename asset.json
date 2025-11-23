@@ -1,0 +1,84 @@
+{
+  "revolve": {
+    "defaultBg": "https://fastly.picsum.photos/id/30/1280/901.jpg?hmac=A_hpFyEavMBB7Dsmmp53kPXKmatwM05MUDatlWSgATE",
+    "sounds": {},
+    "modeIcons": {
+      "revolve": "./assets/stack.png",
+      "list": "./assets/list.png"
+    }
+  },
+  "events": {
+    "IndexHover": {"src": "./assets/hover.mp3", "volume": 0.025},
+    "IndexClick": {"src": "", "volume": 0.6},
+    "InventoryHover": {"src": "./assets/hoverInv.mp3", "volume": 0.025},
+    "InventorySelect": {"src": "./assets/invselect.mp3", "volume": 0.05},
+    "InventoryTab": {"src": "./assets/tab.mp3", "volume": 0.075},
+    "CardHover": {"src": "", "volume": 0.6},
+    "CardNext": {"src": "./assets/card.mp3", "volume": 0.075},
+    "CardPrev": {"src": "./assets/card.mp3", "volume": 0.075},
+    "CardClick": {"src": "./assets/cardselect.mp3", "volume": 0.2},
+    "RevolveHover": {"src": "./assets/hover.mp3", "volume": 0.025},
+    "VisSwitch": {"src": "./assets/switch.mp3", "volume": 0.025},
+    "SocialHover": {"src": "./assets/hover.mp3", "volume": 0.025}
+  },
+  "title": {
+    "bgm": "https://files.catbox.moe/esxa3a.mp3",
+    "defaultBg": "YOUR-BACKGROUND.jpg",
+    "bgVideo": "./assets/loop.mp4",
+    "font": "./assets/Star Crush.ttf",
+    "fontFamily": "Star Crush",
+    "bannerOpacity": 0.25,
+    "audioBaseVolume": 0.1,
+    "captcha": "./assets/captcha.png"
+  },
+  "stats": {
+    "leftIcon": "./assets/list.png",
+    "rightIcon": "./assets/stack.png",
+    "icons": {
+      "strength": "./assets/stats/strength.png",
+      "dexterity": "./assets/stats/dexterity.png",
+      "wisdom": "./assets/stats/wisdom.png",
+      "intelligence": "./assets/stats/intelligence.png",
+      "constitution": "./assets/stats/constitution.png",
+      "charisma": "./assets/stats/charisma.png"
+    },
+    "iconSizePx": 40
+  },
+  "socialsRepo": {
+    "Facebook":   { "icon": "./assets/sites/facebook.png",   "color": "#1877F2", "created": "default" },
+    "YouTube":    { "icon": "./assets/sites/youtube.png",    "color": "#FF0000", "created": "default" },
+    "WhatsApp":   { "icon": "./assets/sites/whatsapp.png",   "color": "#25D366", "created": "default" },
+    "Instagram":  { "icon": "./assets/sites/instagram.png",  "color": "#E1306C", "created": "default" },
+    "TikTok":     { "icon": "./assets/sites/tiktok.png",     "color": "#000000", "created": "default" },
+    "WeChat":     { "icon": "./assets/sites/wechat.png",     "color": "#07C160", "created": "default" },
+    "Telegram":   { "icon": "./assets/sites/telegram.png",   "color": "#26A5E4", "created": "default" },
+    "Snapchat":   { "icon": "./assets/sites/snapchat.png",   "color": "#FFFC00", "created": "default" },
+    "X":          { "icon": "./assets/sites/x.png",          "color": "#FFFFFF", "created": "default" },
+    "Pinterest":  { "icon": "./assets/sites/pinterest.png",  "color": "#E60023", "created": "default" },
+    "LinkedIn":   { "icon": "./assets/sites/linkedin.png",   "color": "#0A66C2", "created": "default" },
+    "Reddit":     { "icon": "./assets/sites/reddit.png",     "color": "#FF4500", "created": "default" },
+    "Bilibili":   { "icon": "./assets/sites/bilibili.png",   "color": "#00A1D6", "created": "default" },
+    "Discord":    { "icon": "./assets/sites/discord.png",    "color": "#5865F2", "created": "default" },
+    "ArtStation": { "icon": "./assets/sites/artstation.png", "color": "#13AFF0", "created": "default" },
+    "Behance":    { "icon": "./assets/sites/behance.png",    "color": "#1769FF", "created": "default" },
+    "DeviantArt": { "icon": "./assets/sites/deviantart.png", "color": "#05CC47", "created": "default" },
+    "Dribbble":   { "icon": "./assets/sites/dribbble.png",   "color": "#EA4C89", "created": "default" },
+    "Pixiv":      { "icon": "./assets/sites/pixiv.png",      "color": "#0096FA", "created": "default" },
+    "Newgrounds": { "icon": "./assets/sites/newgrounds.png", "color": "#FFB000", "created": "default" },
+    "Tumblr":     { "icon": "./assets/sites/tumblr.png",     "color": "#001935", "created": "default" },
+    "Flickr":     { "icon": "./assets/sites/flickr.png",     "color": "#FF0084", "created": "default" },
+    "Vimeo":      { "icon": "./assets/sites/vimeo.png",      "color": "#1AB7EA", "created": "default" }
+  },
+  "sitesRepo": {
+    "Sketchfab":  { "icon": "./assets/sites/sketchfab.png",  "color": "#00A0FF", "created": "default" },
+    "Patreon":    { "icon": "./assets/sites/patreon.png",    "color": "#FF424D", "created": "default" },
+    "Gumroad":    { "icon": "./assets/sites/gumroad.png",    "color": "#36A9AE", "created": "default" },
+    "Ko-fi":      { "icon": "./assets/sites/kofi.png",       "color": "#29ABE0", "created": "default" },
+    "Sellfy":     { "icon": "./assets/sites/sellfy.png",     "color": "#00B353", "created": "default" },
+    "Shopify":    { "icon": "./assets/sites/shopify.png",    "color": "#96BF48", "created": "default" },
+    "GitHub":     { "icon": "./assets/sites/github.png",     "color": "#181717", "created": "default" },
+    "CodePen":    { "icon": "./assets/sites/codepen.png",    "color": "#000000", "created": "default" },
+    "Figma":      { "icon": "./assets/sites/figma.png",      "color": "#F24E1E", "created": "default" },
+    "App Store":  { "icon": "./assets/sites/appstore.png",   "color": "#0D96F6", "created": "default" }
+  }
+}

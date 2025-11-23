@@ -1,0 +1,360 @@
+<!-- charSheet_test.html
+     Test page for "bubbling XP" inside an XP fill.
+     Includes:
+      - XP bar with notches
+      - Level label, computed fill percent from months (sample logic)
+      - Micro-bubble system using your exact settings
+     Original uploaded bubbles file (user-supplied): /mnt/data/bubbles.html
+-->
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>XP Bar — Bubbling Test</title>
+<style>
+  :root{
+    --gap: 12px;
+    --accent: #5ae3ff;
+    --scale: 1;
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    color-scheme: dark;
+  }
+
+  body{
+    background: #0b0d10;
+    color: #d6e6f2;
+    display: flex;
+    min-height: 100vh;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 36px;
+    box-sizing: border-box;
+  }
+
+  .card{
+    width: 760px;
+    background: linear-gradient(180deg, #0f1318 0%, #0b0e12 100%);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 6px 30px rgba(0,0,0,0.6);
+  }
+
+  h1{ font-size: 18px; margin: 0 0 12px 0; }
+
+  /* XP container: taller block, bigger level font, tighter bar */
+  .xp{
+    margin-top: var(--gap);
+    background: #151a21;
+    border-radius: 10px;
+    padding: 16px;
+    display: block;
+  }
+  .xp .line{
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .xp .line .lvl{
+    font-weight:800;
+    font-size: calc(15px * var(--scale));
+    letter-spacing: 0.02em;
+    min-width: 90px;
+  }
+
+  /* bar itself visually shorter (thinner), with inner padding for bubbles */
+  .xp .bar{
+    position: relative;
+    flex: 1;
+    height: calc(14px * var(--scale));
+    background: #0f1318;
+    border-radius: 999px;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 0;
+    align-items: center;
+    padding: 6px 8px;
+    overflow: hidden;
+  }
+
+  /* fill becomes a clipped container for bubbles; absolute so width controls visible fill */
+  .xp .bar .fill{
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 0%;
+    background: linear-gradient(90deg, rgba(126,200,255,.95), rgba(80,170,230,.85));
+    border-radius: 999px;
+    overflow: hidden;
+    transition: width 600ms cubic-bezier(.2,.9,.3,1);
+  }
+
+  /* notches should sit above the fill */
+  .xp .bar .notch{
+    width:3px;
+    height:60%;
+    background: var(--accent);
+    border-radius:2px;
+    justify-self:center;
+    opacity:.9;
+    z-index: 3;
+    pointer-events: none;
+  }
+  .xp .bar .notch:nth-of-type(odd){ height:45%; }
+
+  /* tiny xp-bubble styles, local to the fill */
+  .xp .bar .xp-bubble{
+    position:absolute;
+    border-radius:50%;
+    pointer-events:none;
+    background: radial-gradient(circle at 30% 30%,
+      rgba(255,255,255,0.95),
+      rgba(255,255,255,0.35) 18%,
+      rgba(255,255,255,0.08) 50%);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25), inset -3px -2px 8px rgba(255,255,255,0.03);
+    transform: translate3d(0,0,0);
+    will-change: transform, opacity;
+    mix-blend-mode: screen;
+    z-index: 2;
+    opacity: 0.95;
+  }
+
+  @keyframes xpRise{
+    0%   { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(var(--rise, -20px)); opacity: 0.06; }
+  }
+
+  /* controls for testing */
+  .controls{
+    margin-top: 16px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .controls label{ font-size: 13px; color:#9fbad0; }
+  .controls input[type=range]{ width: 240px; }
+  .controls .small{ font-size:13px; color:#9fbad0; }
+
+  footer{ margin-top: 14px; font-size:12px; color:#9fbad0; opacity:0.9; }
+
+  /* tiny responsiveness */
+  @media (max-width:780px){
+    .card{ width: 100%; padding: 12px; }
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>XP bar — bubbling demo</h1>
+
+    <div class="xp">
+      <div class="line">
+        <div class="lvl" id="lvl-value">LVL: 0</div>
+        <div class="bar" id="xp-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="fill" id="xp-fill" style="width:0%"></div>
+
+          <!-- twelve notches -->
+          <div class="notch"></div><div class="notch"></div><div class="notch"></div><div class="notch"></div>
+          <div class="notch"></div><div class="notch"></div><div class="notch"></div><div class="notch"></div>
+          <div class="notch"></div><div class="notch"></div><div class="notch"></div><div class="notch"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls" aria-hidden="false">
+      <div>
+        <label>Level (years): <span id="level-display">0</span></label><br>
+        <input id="level-range" type="range" min="0" max="20" value="0">
+      </div>
+
+      <div>
+        <label>Months (0–11): <span id="month-display">0</span></label><br>
+        <input id="month-range" type="range" min="0" max="11" value="0">
+      </div>
+
+      <div>
+        <button id="rand-btn">Random sample</button>
+        <button id="fill-btn">Force refill</button>
+      </div>
+
+      <div class="small">Source file (uploaded): <a href="/mnt/data/bubbles.html">/mnt/data/bubbles.html</a></div>
+    </div>
+
+    <footer>
+      Save this file, open it in a browser to test, then share it with your coder. If the file link above is mapped by your environment, it points to the original bubbles source.
+    </footer>
+  </div>
+
+<script>
+/* ----- small DOM helpers ----- */
+const el = id => document.getElementById(id);
+
+/* --- monthsBetween (same logic as your project) --- */
+function monthsBetween(birth){
+  if(!birth) return {years:0, months:0, days:0};
+  const b = new Date(birth);
+  if(isNaN(b.getTime())) return {years:0, months:0, days:0};
+  const now = new Date();
+  let years = now.getFullYear() - b.getFullYear();
+  let months = now.getMonth() - b.getMonth();
+  let days = now.getDate() - b.getDate();
+  if(days < 0){
+    const prevMonthDays = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+    days += prevMonthDays; months -= 1;
+  }
+  while(months < 0){ months += 12; years -= 1; }
+  if(years < 0){ years = 0; months = 0; days = 0; }
+  months = Math.max(0, Math.min(11, months));
+  return {years, months, days};
+}
+
+/* --- initialise demo inputs and state --- */
+const levelRange = el('level-range');
+const monthRange = el('month-range');
+const levelDisplay = el('level-display');
+const monthDisplay = el('month-display');
+const lvlValue = el('lvl-value');
+const fill = el('xp-fill');
+
+function updateUIFromControls(){
+  const lvl = Number(levelRange.value);
+  const month = Number(monthRange.value);
+  levelDisplay.textContent = String(lvl);
+  monthDisplay.textContent = String(month);
+  lvlValue.textContent = `LVL: ${lvl}`;
+  // set fill percent (month/12)
+  setXpFillPercent((month/12)*100);
+  // update ARIA
+  const bar = el('xp-bar');
+  if(bar) bar.setAttribute('aria-valuenow', Math.round((month/12)*100));
+}
+
+/* attach handlers */
+levelRange.addEventListener('input', () => { updateUIFromControls(); });
+monthRange.addEventListener('input', () => { updateUIFromControls(); });
+
+el('rand-btn').addEventListener('click', () => {
+  const rLvl = Math.floor(Math.random()*16);
+  const rMonth = Math.floor(Math.random()*12);
+  levelRange.value = rLvl;
+  monthRange.value = rMonth;
+  updateUIFromControls();
+});
+el('fill-btn').addEventListener('click', () => xpInitialFill());
+
+/* --- XP bubbling micro-system (your exact settings) --- */
+const xpBubbleConfig = {
+  densityFactor: 0.055,   // Spawn density
+  bias: 0.92,             // Surface bias (bubble height)
+  startMin: 0.18,         // Settled (start) min
+  startMax: 0.42,         // Settled (start) max
+  riseMinFrac: 0.48,      // Min travel fraction (travel dist)
+  activeRatio: 0.75,      // Active ratio (fast bubbles)
+  minDuration: 1200,      // Min duration (ms)
+  maxDuration: 4200       // Max duration (ms)
+};
+
+const xpRnd = (a,b) => Math.random()*(b-a)+a;
+const xpClamp = (v,a,b) => Math.max(a, Math.min(b, v));
+
+function xpComputePopCount(){
+  if(!fill) return 6;
+  const rect = fill.getBoundingClientRect();
+  // gentle formula: area * densityFactor / 1000; clamp to sensible limits
+  const approx = Math.round((rect.width * rect.height) * xpBubbleConfig.densityFactor / 1000);
+  return Math.max(4, Math.min(40, Math.round(approx)));
+}
+
+function xpCreateBubble(){
+  if(!fill) return;
+  const fRect = fill.getBoundingClientRect();
+  // ignore if tiny
+  if(fRect.width < 6 || fRect.height < 6) return;
+
+  const b = document.createElement('div');
+  b.className = 'xp-bubble';
+
+  // tiny sizes for XP bar; micro feel
+  const size = Math.round(xpRnd(2, Math.max(4, 8)));
+  const leftPct = xpRnd(2, 98);
+
+  const active = Math.random() < xpBubbleConfig.activeRatio;
+  const dur = Math.round(xpRnd(active ? xpBubbleConfig.minDuration : (xpBubbleConfig.minDuration + 200),
+                              active ? Math.max(xpBubbleConfig.minDuration, xpBubbleConfig.maxDuration - 800)
+                                     : xpBubbleConfig.maxDuration));
+
+  const startFrac = xpRnd(xpBubbleConfig.startMin, xpBubbleConfig.startMax);
+  const startBottomPx = Math.round(startFrac * fRect.height);
+
+  const bias = xpClamp(xpBubbleConfig.bias + xpRnd(-0.03, 0.03), 0.7, 0.99);
+  const targetTopPx = Math.round(fRect.height * bias);
+  const riseDist = Math.round(targetTopPx - startBottomPx);
+  // ensure enough rise distance; negative moves up
+  const effectiveRise = -Math.max(Math.round(fRect.height * xpBubbleConfig.riseMinFrac), Math.abs(riseDist));
+
+  b.style.width = size + 'px';
+  b.style.height = size + 'px';
+  b.style.left = leftPct + '%';
+  b.style.bottom = startBottomPx + 'px';
+  b.style.opacity = size < 6 ? 0.82 : 0.95;
+  b.style.filter = size < 4 ? 'blur(0.3px)' : 'none';
+  b.style.setProperty('--rise', effectiveRise + 'px');
+  b.style.animation = `xpRise ${dur}ms linear 1 forwards`;
+
+  fill.appendChild(b);
+
+  const onEnd = (ev) => {
+    if(ev.animationName === 'xpRise'){
+      b.removeEventListener('animationend', onEnd);
+      b.style.transition = 'transform 160ms ease, opacity 120ms linear';
+      b.style.transform = 'scale(0.45)';
+      b.style.opacity = '0';
+      setTimeout(() => { b.remove(); }, 180);
+      setTimeout(xpSpawnBubble, Math.round(xpRnd(60, 460)));
+    }
+  };
+  b.addEventListener('animationend', onEnd);
+  return b;
+}
+
+function xpSpawnBubble(){ xpCreateBubble(); }
+
+let XP_POP = xpComputePopCount();
+
+function xpInitialFill(){
+  if(!fill) return;
+  XP_POP = xpComputePopCount();
+  // clear existing bubbles
+  Array.from(fill.querySelectorAll('.xp-bubble')).forEach(n => n.remove());
+  // stagger spawn so it seems organic
+  const stagger = 600;
+  for(let i=0;i<XP_POP;i++){
+    setTimeout(xpSpawnBubble, Math.round(xpRnd(0, stagger)) * i / Math.max(1, XP_POP-1));
+  }
+}
+
+/* wrapper to set fill width and refresh bubbles */
+function setXpFillPercent(pct){
+  if(!fill) return;
+  const clean = Math.max(0, Math.min(100, Number(pct)));
+  fill.style.width = clean + '%';
+  // repopulate for the new visible width
+  xpInitialFill();
+}
+
+/* expose a tiny debug API */
+window._xpBub = {
+  config: xpBubbleConfig,
+  refill: xpInitialFill,
+  add: (n=1)=>{ while(n-->0) xpSpawnBubble(); },
+  clear: ()=>{ Array.from(fill.querySelectorAll('.xp-bubble')).forEach(n=>n.remove()); }
+};
+
+/* --- start defaults --- */
+updateUIFromControls();  // sets initial display and populate bubbles
+</script>
+</body>
+</html>

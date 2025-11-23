@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Character Sheet</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+  <style>
+    :root{--scale:.75;--sheet-w:calc(780px * var(--scale));--sheet-h:calc(600px * var(--scale));--radius:14px;--gap:14px;--accent:#7ec8ff;--card-w:calc(280px * var(--scale));--card-h:calc(400px * var(--scale))}
+    html,body{height:100%}
+    body{margin:0;background:#0e1216;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;display:grid;align-items:start;justify-items:center}
+    .sheet{position:relative;width:min(var(--sheet-w), 94vw);min-height:min(var(--sheet-h), 92vh);height:auto;background:#12161b;border-radius:var(--radius);box-shadow:0 16px 36px rgba(0,0,0,.55);overflow:auto;display:grid;grid-template-columns:1fr;grid-template-rows:auto 1fr auto;padding:18px;margin:40px 0}
+    .title-wrap{position:relative;height:calc(70px * var(--scale));display:grid;place-items:center;margin-bottom:calc(-1 * (12px * var(--scale)));pointer-events:none}
+    .title-wrap .trapezoid{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:var(--card-w);height:calc(70px * var(--scale));clip-path:polygon(0 0, 100% 0, 90% 100%, 10% 100%);background:#1a2027;border-radius:10px;z-index:2}
+    .title-wrap .name{position:relative;top:12px;font-weight:800;letter-spacing:.4px;z-index:3;text-align:center;white-space:nowrap;font-size:clamp(16px, calc(var(--card-w)/10), 42px);user-select:none}
+    .content{display:grid;grid-template-columns:1fr var(--card-w) 1fr;gap:var(--gap);align-items:start}
+    .card{width:var(--card-w);height:var(--card-h);border-radius:16px;background:#0f1318;box-shadow:0 12px 28px rgba(0,0,0,.5);position:relative;overflow:hidden;justify-self:center;z-index:2}
+    .card .bg{position:absolute;inset:0;object-fit:cover;width:100%;height:100%;filter:saturate(1.05) contrast(1.02);pointer-events:none;user-select:none}
+    .card .avatar{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:75%;height:auto;object-fit:contain;user-select:none;-webkit-user-drag:none;pointer-events:none}
+    .stats{display:grid;grid-template-rows:repeat(3, calc(var(--card-h)/3 - var(--gap)));gap:var(--gap);z-index:1}
+    .stats.left{margin-right:-20px}
+    .stats.right{margin-left:-20px}
+    .stat{background:#151a21;border-radius:10px;padding:10px 12px;display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;position:relative}
+    .stat.right{grid-template-columns:1fr auto}
+    .stat .icon{width:var(--stat-icon-size, calc(24px * var(--scale)));height:var(--stat-icon-size, calc(24px * var(--scale)))}
+    .stat.right .icon{justify-self:end}
+    .stat .text{display:flex;flex-direction:column;align-items:flex-end;margin-right:8px}
+    .stats.right .stat .text{align-items:flex-start;margin-left:12px}
+    .stat .label{text-transform:uppercase;opacity:.8}
+    .stat .value{font-weight:800;font-size:calc(20px * var(--scale))}
+    .stats.right .stat .text{align-items:flex-start}
+    .toolbar{position:absolute;top:14px;left:14px;display:flex;align-items:center;gap:10px;z-index:10}
+    .toolbar .label{font-weight:800}
+    .toolbar .stats-icon{width:22px;height:22px;filter:brightness(0) saturate(100%) invert(69%) sepia(11%) saturate(1567%) hue-rotate(172deg) brightness(97%) contrast(96%)}
+    .vis-switch{display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 8px;border-radius:999px;position:relative;z-index:10}
+    .vis-switch .slider{position:relative;width:34px;height:20px;border-radius:999px;background:#151a21;border:2px solid var(--accent)}
+    .vis-switch .slider::after{content:"";position:absolute;top:50%;left:2px;transform:translateY(-50%) translateX(0);width:14px;height:14px;border-radius:50%;background:var(--accent)}
+    .vis-switch.off .slider::after{transform:translateY(-50%) translateX(0)}
+    .vis-switch:not(.off) .slider::after{transform:translateY(-50%) translateX(14px)}
+    .vis-switch img{width:16px;height:16px;opacity:.6}
+    .vis-switch.off{opacity:.85}
+    .xp{margin-top:var(--gap);background:#151a21;border-radius:10px;padding:12px}
+    .xp .line{display:flex;align-items:center;gap:12px}
+    .xp .line .lvl{font-weight:800}
+    .xp .bar{position:relative;flex:1;height:calc(24px * var(--scale));background:#0f1318;border-radius:999px;display:grid;grid-template-columns:repeat(12, 1fr);gap:0;align-items:center;padding:0 8px;overflow:hidden}
+    .xp .bar .fill{position:absolute;left:0;top:0;bottom:0;background:rgba(126,200,255,.8);border-radius:999px}
+    .xp .bar .notch{width:3px;height:60%;background:var(--accent);border-radius:2px;justify-self:center;opacity:.9}
+    .xp .bar .notch:nth-of-type(odd){height:45%}
+    .tabs{margin-top:var(--gap)}
+    .tab-buttons{display:flex;gap:10px;margin-bottom:12px}
+    .tab-buttons button{background:#151a21;color:#fff;border:1px solid #2b3139;border-radius:8px;padding:8px 12px;cursor:pointer}
+    .tab-buttons button.active{outline:2px solid var(--accent)}
+    .tab-content{background:#151a21;border-radius:10px;padding:12px;min-height:120px}
+    .items{display:grid;grid-template-columns:repeat(auto-fill, minmax(140px,1fr));gap:10px}
+    .item{background:#0f1318;border-radius:8px;padding:8px}
+       /* Portfolio Inventory Styles */
+    .inventory-container{display:flex;flex-direction:column;align-items:center;gap:20px;padding:20px}
+    .inventory-slots{display:grid;grid-template-columns:repeat(3, 1fr);gap:15px;width:100%;max-width:300px}
+    .inventory-slot{width:80px;height:80px;background:#0f1318;border:2px solid #2b3139;border-radius:8px;display:grid;place-items:center;cursor:pointer;transition:all 0.2s ease}
+    .inventory-slot:hover{border-color:var(--accent);transform:scale(1.05);background:var(--accent)}
+    .inventory-slot.selected{border-color:var(--accent);box-shadow:0 0 10px rgba(126,200,255,0.5)}
+    .inventory-slot img{width:60px;height:60px;object-fit:contain}
+    .inventory-details{background:#10151b;border:1px solid #253040;border-radius:10px;padding:20px;box-sizing:border-box;width:calc(100% + 46px);margin-left:-23px;margin-right:-23px;min-height:200px}
+    .dispbox-container{display:flex;align-items:flex-start;gap:15px}
+    .dispbox{aspect-ratio:1 / 1;width:auto;background:#0f1318;border-radius:8px;display:grid;place-items:center;border:2px solid #2b3139}
+    .dispbox img{width:90%;height:90%;object-fit:contain}
+    .item-info{flex:1;display:flex;flex-direction:column;gap:10px}
+    .item-name{background:#0f1318;padding:8px 12px;border-radius:0 12px 12px 0;font-size:1.2rem;font-weight:700;color:var(--accent);display:inline-block;width:fit-content;margin-left:-10px}
+    .item-desc{color:#ccc;font-size:0.9rem;line-height:1.4;min-height:60px;margin-left:5px}
+    .related-links{display:flex;align-items:center;gap:10px;margin-top:auto;margin-left:5px}
+    .related-links h3{margin:0;font-size:0.9rem;color:#aaa}
+    .link-button{width:32px;height:32px;border-radius:50%;background:#0f1318;border:2px solid #2b3139;display:grid;place-items:center;cursor:pointer;transition:all 0.2s ease}
+    .link-button:hover{background:var(--accent);border-color:var(--accent)}
+    .link-button img{width:18px;height:18px;object-fit:contain;opacity:0.7}
+    .link-button:hover img{opacity:1;filter:brightness(0) invert(1)}
+    a{color:#7ec8ff}
+    .title-wrap .trapezoid{z-index:2;box-shadow:0 6px 14px rgba(0,0,0,.35)}
+    .title-wrap .name{z-index:3}
+    .card{z-index:3}
+    .stats{position:relative;z-index:2}
+    .sheet{overflow-y:auto;overflow-x:hidden}
+    .tab-content{padding:18px;line-height:1.6;text-align:justify;word-wrap:break-word}
+    .tab-content p{margin:0 0 12px 0;text-align:justify}
+    .tab-content ul{margin:0;padding-left:20px}
+    .tab-content li{margin:4px 0;text-align:justify}
+    .socials-box{display:grid;place-items:center;aspect-ratio:3 / 2;background:#0f1318;border:1px solid #253040;border-radius:10px;overflow:hidden}
+    .socials-stage{display:flex;align-items:center;justify-content:center;padding:18px}
+    .axis-wrap{position:relative;display:flex;align-items:center;justify-content:center}
+    .ring{position:absolute;inset:0;border-radius:50%;box-shadow:0 0 0 6px rgba(255,255,255,0.02) inset, 0 0 0 2px rgba(255,255,255,0.03) inset;border:2px solid rgba(255,255,255,0.03);pointer-events:none}
+    .center{position:relative;z-index:10;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));box-shadow:0 8px 30px rgba(2,8,23,0.6), 0 2px 6px rgba(0,0,0,0.6);border:3px solid rgba(255,255,255,0.04)}
+    .center .bg{position:absolute;inset:0;background-size:cover;background-position:center;filter:contrast(1.05) saturate(1.05)}
+    .center .fg{position:absolute;left:50%;bottom:0;transform:translateX(-50%);z-index:2;pointer-events:none;width:80%;height:auto;object-fit:contain}
+    .orbit{position:absolute;inset:0;display:block;transform-origin:center center;z-index:5;pointer-events:none}
+    .orb{position:absolute;left:50%;top:50%;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(0,0,0,0.06));box-shadow:0 6px 18px rgba(2,8,23,0.6), 0 0 12px var(--orb-glow, transparent);border:2px solid var(--orb-color, rgba(255,255,255,0.04));cursor:pointer;pointer-events:auto;transition:transform .18s ease, box-shadow .18s ease, opacity .18s ease}
+    .orb:hover{transform:scale(1.06);box-shadow:0 10px 30px rgba(11,30,60,0.6);opacity:.95}
+    .logo{display:block;filter:drop-shadow(0 1px 0 rgba(0,0,0,0.25));transform-origin:center center}
+    .logo img{width:100%;height:100%;object-fit:contain}
+    .banner{position:fixed;z-index:20;padding:10px 14px;border-radius:999px;display:flex;align-items:center;gap:10px;font-size:14px;background:rgba(8,12,18,0.85);box-shadow:0 8px 30px rgba(0,0,0,0.6);transform-origin:center;white-space:nowrap;opacity:0;pointer-events:auto;transition:opacity .18s ease,transform .18s ease;max-height:48px;line-height:1.2;overflow:hidden;box-sizing:border-box}
+    .banner.show{opacity:1}
+    .banner .handle{color:#fff;font-weight:600;display:inline-block;max-width:220px;overflow:hidden;text-overflow:ellipsis}
+    .banner .cta{opacity:.75;font-size:12px}
+    .banner::after{content:'';position:absolute;width:var(--pointer-size, 12px);height:var(--pointer-size, 12px);background:inherit;border-radius:var(--pointer-radius, 2px);transform:rotate(45deg)}
+    .banner.left::after{right:var(--pointer-offset, -6px);top:50%;transform:translateY(-50%) rotate(45deg)}
+    .banner.right::after{left:var(--pointer-offset, -6px);top:50%;transform:translateY(-50%) rotate(45deg)}
+    @media (max-width:640px){
+      .banner{max-height:40px;padding:8px 12px}
+      .banner .handle{max-width:160px}
+    }
+  </style>
+  </head>
+<body>
+  <div class="sheet">
+      <div class="toolbar"><div class="label">STATS</div><img class="stats-icon" src="./assets/stats.svg" alt="stats" /><div class="vis-switch" id="vis-switch"><div class="slider" aria-hidden="true"></div><img id="vis-icon" src="./assets/vis.png" alt="visibility" /></div></div>
+    <div class="title-wrap" style="z-index:5;">
+      <div class="trapezoid"></div>
+      <div class="name" id="name">Character</div>
+    </div>
+    <div class="content">
+      <div class="stats animate__animated animate__zoomInLeft left" id="stats-left"></div>
+      <div class="card">
+        <img class="bg" id="bg" alt="background" draggable="false" />
+        <img class="avatar" id="avatar" alt="avatar" draggable="false" />
+      </div>
+      <div class="stats animate__animated animate__zoomInRight right" id="stats-right"></div>
+    </div>
+    <div class="xp">
+      <div class="line"><div class="lvl" id="lvl-value">LVL: 0</div><div class="bar" id="xp-bar"><div class="fill" id="xp-fill" style="width:0%"></div>
+        <div class="notch"></div><div class="notch"></div><div class="notch"></div><div class="notch"></div><div class="notch"></div><div class="notch"></div><div class="notch"></div><div class="notch"></div><div class="notch"></div><div class="notch"></div><div class="notch"></div><div class="notch"></div>
+      </div></div>
+    </div>
+    <div class="tabs">
+      <div class="tab-buttons">
+        <button class="active" data-tab="desc">Desc</button>
+        <button data-tab="portfolio">Portfolio</button>
+        <button data-tab="socials">Socials</button>
+      </div>
+      <div class="tab-content" id="tab-desc"></div>
+      <div class="tab-content" id="tab-portfolio" style="display:none"></div>
+      <div class="tab-content" id="tab-socials" style="display:none"></div>
+    </div>
+  </div>
+
+  <script src="charSheet.js"></script>
+  </body>
+  </html>

@@ -47,7 +47,16 @@ async function init(){
   characters=dataSection.characters||[];
   defaultBg=(assets.revolve&&assets.revolve.defaultBg)||dataSection.defaultBg||"";
   const events=assets.events||{};
-  Object.keys(events).forEach(k=>{ const v=events[k]||{}; if(v.src){ const a=new Audio(v.src); a.volume=typeof v.volume==='number'?v.volume:0.5; eventAudio[k]=a; } });
+  const ASSET_FALLBACK_BASE='https://justanassetfolder.netlify.app';
+  function toFallback(src){ try{ if(src && src.startsWith('./assets/')){ return ASSET_FALLBACK_BASE + '/' + src.slice('./assets/'.length); } }catch{} return src; }
+  function attachAudioFallback(a, src){ try{ a.addEventListener('error',()=>{ try{ a.src = toFallback(src); }catch{} }); }catch{} }
+  Object.keys(events).forEach(k=>{ const v=events[k]||{}; if(v.src){ const a=new Audio(v.src); a.volume=typeof v.volume==='number'?v.volume:0.5; attachAudioFallback(a, v.src); eventAudio[k]=a; } });
+  const eventPools={}; const fadeTimers=new WeakMap(); const hoverAudioMap=new WeakMap();
+  function getEventInstance(name){ const cfg=events[name]||{}; if(!cfg.src) return null; const pool=eventPools[name]||(eventPools[name]=[]); for(let i=0;i<pool.length;i++){ const inst=pool[i]; if(inst.paused||inst.ended){ try{ inst.volume=typeof cfg.volume==='number'?cfg.volume:0.5; inst.currentTime=0; }catch{} return inst; } } const inst=new Audio(cfg.src); inst.volume=typeof cfg.volume==='number'?cfg.volume:0.5; attachAudioFallback(inst, cfg.src); pool.push(inst); return inst }
+  function clearFade(inst){ const t=fadeTimers.get(inst); if(t){ try{ clearInterval(t); }catch{} } fadeTimers.delete(inst) }
+  function fadeAudioTo(au,target,ms){ const start=au.volume; const delta=target-start; const steps=8; const step=delta/steps; let i=0; const d=Math.max(16, Math.round((ms||300)/steps)); const t=setInterval(()=>{ au.volume=Math.max(0, Math.min(1, start + step*(i+1))); i++; if(i>=steps){ clearInterval(t); au.volume=target; } }, d); fadeTimers.set(au,t); return t }
+  function playEvent(name,opts){ const inst=getEventInstance(name); if(inst){ try{ clearFade(inst); inst.volume=(events[name]&&typeof events[name].volume==='number')?events[name].volume:0.5; inst.currentTime=0; inst.play().catch(()=>{}); if(opts&&opts.target){ hoverAudioMap.set(opts.target, inst); } }catch{} } return inst }
+  function stopEventInstance(inst,ms){ if(!inst) return; try{ clearFade(inst); fadeAudioTo(inst,0,ms||300); setTimeout(()=>{ try{ inst.pause(); inst.currentTime=0; }catch{} }, (ms||300)+20); }catch{} }
   const page=settingsSection.page||settingsSection||{};
   const cards=settingsSection.cards||{};
   const bubble=settingsSection.bubble||{};
@@ -132,12 +141,19 @@ async function init(){
   const modeListBtn=document.querySelector('#mode-list img');
   if(modeRevolveBtn&&modeIcons.revolve){modeRevolveBtn.src=modeIcons.revolve}
   if(modeListBtn&&modeIcons.list){modeListBtn.src=modeIcons.list}
+  if(modeRevolveBtn){ modeRevolveBtn.addEventListener('error',()=>{ try{ modeRevolveBtn.src = toFallback(modeIcons.revolve); }catch{} }); }
+  if(modeListBtn){ modeListBtn.addEventListener('error',()=>{ try{ modeListBtn.src = toFallback(modeIcons.list); }catch{} }); }
+  const modeRevolve=document.getElementById('mode-revolve');
+  const modeList=document.getElementById('mode-list');
+  if(modeRevolve){ modeRevolve.addEventListener('mouseenter',()=>{ playEvent('RevolveHover',{target:modeRevolve}); }); modeRevolve.addEventListener('mouseleave',()=>{ stopEventInstance(hoverAudioMap.get(modeRevolve),300); hoverAudioMap.delete(modeRevolve); }); }
+  if(modeList){ modeList.addEventListener('mouseenter',()=>{ playEvent('RevolveHover',{target:modeList}); }); modeList.addEventListener('mouseleave',()=>{ stopEventInstance(hoverAudioMap.get(modeList),300); hoverAudioMap.delete(modeList); }); }
   const twitch=settingsSection.twitch||{};
   const cta=document.getElementById('cta-purple');
   const ctaHandle=document.getElementById('cta-handle');
   const ctaIcon=document.getElementById('cta-icon');
   if(ctaHandle&&typeof twitch.handle!=="undefined"){ ctaHandle.textContent=String(twitch.handle); }
   if(ctaIcon&&twitch.icon){ ctaIcon.src=String(twitch.icon); }
+  if(cta){ cta.addEventListener('mouseenter',()=>{ playEvent('RevolveHover',{target:cta}); }); cta.addEventListener('mouseleave',()=>{ stopEventInstance(hoverAudioMap.get(cta),300); hoverAudioMap.delete(cta); }); }
   function adjustCtaWidth(){
     if(!cta||!ctaHandle) return;
     const iconW=ctaIcon?ctaIcon.getBoundingClientRect().width:0;
@@ -152,7 +168,8 @@ async function init(){
   if(cta && twitch.link){ cta.addEventListener('click',()=>{ try{ window.open(String(twitch.link),'_blank','noopener,noreferrer'); }catch{} }); }
   const main=document.getElementById('card-main');
   let dragStartX=null;
-  main.addEventListener('mouseenter',()=>{const a=eventAudio['CardHover']; if(a){a.currentTime=0; a.play().catch(()=>{})}});
+  main.addEventListener('mouseenter',()=>{ playEvent('CardHover',{target:main}); });
+  main.addEventListener('mouseleave',()=>{ stopEventInstance(hoverAudioMap.get(main),300); hoverAudioMap.delete(main); });
   main.addEventListener('pointerdown',(e)=>{
     dragStartX=e.clientX;
   });
@@ -173,14 +190,175 @@ async function init(){
   function handleResize(){ if(!isBubbleAnimating){ renderBubbles(); } }
   stage.addEventListener('mouseenter',(e)=>{
     const pt=document.elementFromPoint(e.clientX, e.clientY);
-    if(pt && (pt.closest('.card')||pt.closest('.arrow'))) return;
-    const a=eventAudio['RevolveHover']; if(a){a.currentTime=0; a.play().catch(()=>{})}
+    if(pt && (pt.closest('.card')||pt.closest('.arrow')||pt.closest('.tracker')||pt.closest('#ui-stack'))) return;
+    playEvent('RevolveHover',{target:stage});
   });
+  stage.addEventListener('mouseleave',()=>{ stopEventInstance(hoverAudioMap.get(stage),300); hoverAudioMap.delete(stage); });
   window.addEventListener('resize',handleResize);
+  const gridCanvas=document.querySelector('.grid-trail');
+  if(gridCanvas){
+    window._gridTrail = initGridTrail({
+      canvas: gridCanvas,
+      spacing: 28,
+      amplitude: 36,
+      trailLen: 28,
+      maxDPR: 1.5,
+      maxNodes: 2200
+    });
+  }
   document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible'){ ensureGlow(); const t=document.getElementById('about-title'); if(t){ t.classList.remove('animate__animated','animate__slideInDown'); t.offsetHeight; t.classList.add('animate__animated','animate__slideInDown'); t.addEventListener('animationend',()=>{ t.classList.remove('animate__animated','animate__slideInDown'); },{once:true}); } } });
   setupAutoRotate();
 }
 init();
+
+function initGridTrail(opts){
+  const settings=Object.assign({ spacing:28, amplitude:36, trailLen:28, maxDPR:1.5, maxNodes:2200, canvas: null }, opts||{});
+  const canvas = settings.canvas || document.getElementById('grid-trail');
+  if(!canvas) return { destroy(){} };
+  const ctx = canvas.getContext('2d');
+  let DPR = Math.min(settings.maxDPR, Math.max(1, window.devicePixelRatio || 1));
+  let nodes = [];
+  const mouse = { x: 0, y: 0, down:false };
+  const trail = [];
+  let rid = null;
+  let lastTime = performance.now();
+
+  function resize(){
+    DPR = Math.min(settings.maxDPR, Math.max(1, window.devicePixelRatio || 1));
+    const w = Math.max(1, innerWidth);
+    const h = Math.max(1, innerHeight);
+    canvas.width = Math.floor(w * DPR);
+    canvas.height = Math.floor(h * DPR);
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    rebuildGrid();
+  }
+
+  function pushTrail(x,y){
+    trail.push({x,y,t:performance.now()});
+    if(trail.length > settings.trailLen) trail.shift();
+  }
+
+  function rebuildGrid(){
+    const spacing = settings.spacing;
+    nodes = [];
+    const w = Math.max(1, innerWidth);
+    const h = Math.max(1, innerHeight);
+    const cols = Math.ceil(w/spacing) + 1;
+    const rows = Math.ceil(h/spacing) + 1;
+    const total = cols*rows;
+    const cap = Math.max(1, settings.maxNodes);
+    for (let j=0;j<rows && nodes.length<cap;j++){
+      for (let i=0;i<cols && nodes.length<cap;i++){
+        const x = i*spacing - (w%spacing)/2;
+        const y = j*spacing - (h%spacing)/2;
+        nodes.push({x,y,ox:x,oy:y,vx:0,vy:0,phase:Math.random()*Math.PI*2});
+      }
+    }
+  }
+
+  function update(dt, t){
+    const amp = settings.amplitude;
+    for (let n of nodes){
+      let influence = 0;
+      for (let k = Math.max(0, trail.length - 6); k < trail.length; k++){
+        const p = trail[k];
+        const dx = n.ox - p.x;
+        const dy = n.oy - p.y;
+        const d2 = dx*dx + dy*dy;
+        const fall = Math.exp(-d2 / (amp * amp * 6));
+        influence = Math.max(influence, fall);
+      }
+      const wobble = 0.8 + Math.sin(t / 300 + n.phase) * 0.4;
+      const targetY = n.oy - influence * amp * wobble;
+      const k_spring = 10;
+      const k_damp = 0.85;
+      n.vy += (targetY - (n.y || n.oy)) * k_spring * dt;
+      n.vy *= Math.pow(k_damp, dt * 60);
+      n.y = (n.y || n.oy) + n.vy * dt * 60;
+    }
+  }
+
+  function draw(){
+    const w = Math.max(1, innerWidth); const h = Math.max(1, innerHeight);
+    ctx.clearRect(0,0,w,h);
+    const spacing = settings.spacing;
+    const colsPerRow = Math.ceil(w / spacing) + 1;
+    ctx.lineWidth = 1;
+    for (let j = 0; j * colsPerRow < nodes.length; j++){
+      const rowStart = j * colsPerRow;
+      ctx.beginPath();
+      for (let i = 0; i < colsPerRow; i++){
+        const idx = rowStart + i;
+        if (idx >= nodes.length) break;
+        const n = nodes[idx];
+        if (i === 0) ctx.moveTo(n.x, n.y || n.oy);
+        else ctx.lineTo(n.x, n.y || n.oy);
+      }
+      let rowAvg = 0; let count = 0;
+      for (let i = 0; i < colsPerRow; i++){
+        const idx = rowStart + i; if (idx >= nodes.length) break;
+        const n = nodes[idx]; rowAvg += Math.abs((n.y || n.oy) - n.oy); count++;
+      }
+      rowAvg = count ? rowAvg / count : 0;
+      const alpha = Math.min(1, 0.25 + rowAvg / (settings.amplitude * 2));
+      ctx.strokeStyle = `rgba(160,210,255,${alpha})`;
+      ctx.stroke();
+    }
+    for (let n of nodes){
+      const ny = n.y || n.oy;
+      const off = ny - n.oy;
+      const r = Math.max(0.8, Math.abs(off) / 8 + 0.8);
+      const a = Math.min(1, Math.abs(off) / (settings.amplitude * 1.2) + 0.15);
+      ctx.beginPath();
+      ctx.arc(n.x, ny, r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(140,200,255,${a})`;
+      ctx.fill();
+    }
+    ctx.beginPath();
+    ctx.arc(mouse.x, mouse.y, 12, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(120,200,255,0.06)';
+    ctx.fill();
+  }
+
+  function frame(t){
+    const dt = Math.min(40, t - lastTime) / 1000;
+    lastTime = t;
+    update(dt, t);
+    draw();
+    rid = requestAnimationFrame(frame);
+  }
+
+  function onMove(e){ mouse.x = e.clientX; mouse.y = e.clientY; if(mouse.down) pushTrail(mouse.x, mouse.y); }
+  function onDown(e){ mouse.down = true; pushTrail(e.clientX, e.clientY); }
+  function onUp(){ mouse.down = false; }
+
+  window.addEventListener('resize', resize);
+  document.addEventListener('pointermove', onMove, { passive:true });
+  document.addEventListener('pointerdown', onDown, { passive:true });
+  document.addEventListener('pointerup', onUp, { passive:true });
+
+  // seed trail
+  { const w = Math.max(1, innerWidth); const h = Math.max(1, innerHeight); for (let i = 0; i < 10; i++) trail.push({x: w / 2, y: h / 2, t: performance.now() - i * 20}); }
+
+  resize();
+  rid = requestAnimationFrame(frame);
+
+  return {
+    destroy(){
+      try{ cancelAnimationFrame(rid); }catch{}
+      window.removeEventListener('resize', resize);
+      document.removeEventListener('pointermove', onMove, { passive:true });
+      document.removeEventListener('pointerdown', onDown, { passive:true });
+      document.removeEventListener('pointerup', onUp, { passive:true });
+      nodes = []; trail.length = 0;
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+    },
+    set(newOpts){ Object.assign(settings, newOpts||{}); rebuildGrid(); },
+    get(){ return Object.assign({}, settings); }
+  };
+}
 
 function navigate(direction,mode){
   if(isCardAnimating||isBubbleAnimating)return;

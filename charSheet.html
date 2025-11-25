@@ -39,13 +39,16 @@
     .vis-switch:not(.off) .slider::after{transform:translateY(-50%) translateX(14px)}
     .vis-switch img{width:16px;height:16px;opacity:.6}
     .vis-switch.off{opacity:.85}
-    .xp{margin-top:var(--gap);background:#151a21;border-radius:10px;padding:12px}
-    .xp .line{display:flex;align-items:center;gap:12px}
-    .xp .line .lvl{font-weight:800}
-    .xp .bar{position:relative;flex:1;height:calc(24px * var(--scale));background:#0f1318;border-radius:999px;display:grid;grid-template-columns:repeat(12, 1fr);gap:0;align-items:center;padding:0 8px;overflow:hidden}
-    .xp .bar .fill{position:absolute;left:0;top:0;bottom:0;background:rgba(126,200,255,.8);border-radius:999px}
-    .xp .bar .notch{width:3px;height:60%;background:var(--accent);border-radius:2px;justify-self:center;opacity:.9}
+    @font-face{font-family:'Level';src:url('./assets/level.ttf') format('truetype');font-display:swap}
+    .xp{margin-top:var(--gap);background:#151a21;border-radius:10px;padding:16px;display:block}
+    .xp .line{display:flex;align-items:center}
+    .xp .line .lvl{font-family:'Level','Star Crush',Arial,sans-serif;font-weight:800;font-size:calc(14px * var(--scale) + 5px);line-height:calc(14px * var(--scale));letter-spacing:.02em;min-width:90px}
+    .xp .bar{position:relative;flex:1;height:calc(14px * var(--scale));background:#0f1318;border-radius:999px;display:grid;grid-template-columns:repeat(12, 1fr);gap:0;align-items:center;padding:6px 8px;overflow:hidden}
+    .xp .bar .fill{position:absolute;left:0;top:0;bottom:0;width:0%;background:linear-gradient(90deg, rgba(126,200,255,.95), rgba(80,170,230,.85));border-radius:999px;overflow:hidden;transition:width 600ms cubic-bezier(.2,.9,.3,1)}
+    .xp .bar .notch{width:3px;height:60%;background:var(--accent);border-radius:2px;justify-self:center;opacity:.9;z-index:3;pointer-events:none}
     .xp .bar .notch:nth-of-type(odd){height:45%}
+    .xp .bar .xp-bubble{position:absolute;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.95), rgba(255,255,255,.35) 18%, rgba(255,255,255,.08) 50%);box-shadow:0 2px 6px rgba(0,0,0,.25), inset -3px -2px 8px rgba(255,255,255,.03);transform:translate3d(0,0,0);will-change:transform,opacity;mix-blend-mode:screen;z-index:2;opacity:.95}
+    @keyframes xpRise{0%{transform:translateY(0);opacity:1}100%{transform:translateY(var(--rise,-20px));opacity:.06}}
     .tabs{margin-top:var(--gap)}
     .tab-buttons{display:flex;gap:10px;margin-bottom:12px}
     .tab-buttons button{background:#151a21;color:#fff;border:1px solid #2b3139;border-radius:8px;padding:8px 12px;cursor:pointer}
@@ -124,7 +127,7 @@
       <div class="stats animate__animated animate__zoomInRight right" id="stats-right"></div>
     </div>
     <div class="xp">
-      <div class="line"><div class="lvl" id="lvl-value">LVL: 0</div><div class="bar" id="xp-bar"><div class="fill" id="xp-fill" style="width:0%"></div>
+      <div class="line"><div class="lvl" id="lvl-value">  LVL: 0</div><div class="bar" id="xp-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="fill" id="xp-fill" style="width:0%"></div>
         <div class="notch"></div><div class="notch"></div><div class="notch"></div><div class="notch"></div><div class="notch"></div><div class="notch"></div><div class="notch"></div><div class="notch"></div><div class="notch"></div><div class="notch"></div><div class="notch"></div><div class="notch"></div>
       </div></div>
     </div>

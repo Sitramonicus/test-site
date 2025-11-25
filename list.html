@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Character Catalogue</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+  <link rel="stylesheet" href="revolve.css" />
+  <link rel="stylesheet" href="list.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/magic/1.1.0/magic.min.css" />
+</head>
+<body>
+  <div class="page">
+    <canvas class="grid-trail" id="grid-trail"></canvas>
+    <div class="stage">
+      <div class="about-wrap"><h1 class="about-title" id="about-title">About Us</h1></div>
+      <div class="catalog" id="catalog"></div>
+      <div class="ui-stack" id="ui-stack">
+        <div class="tracker" id="tracker"></div>
+        <div class="controls" id="controls">
+          <div class="mode-switch">
+            <button class="mode-btn" id="mode-revolve" aria-pressed="false"><img alt="revolve mode" /></button>
+            <button class="mode-btn active" id="mode-list" aria-pressed="true"><img alt="list mode" /></button>
+          </div>
+          <button class="cta-purple" id="cta-purple">
+            <span class="handle" id="cta-handle"></span>
+            <img class="icon" id="cta-icon" alt="twitch" />
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="sheet-overlay">
+    <div class="sheet-modal">
+      <button class="close" id="sheet-close" aria-label="Close">×</button>
+      <iframe id="sheet-frame" title="Character Sheet"></iframe>
+    </div>
+  </div>
+
+  <div id="dialogue-overlay" class="dialogue-overlay hidden">
+    <div id="dialogue-panel" class="dialogue-panel">
+      <div class="dialog-head">
+        <div class="npc-name" id="dlg-name"></div>
+        <div class="mood" id="dlg-mood"></div>
+      </div>
+      <div class="dialog-body"><span id="dlg-text" class="type"></span><span id="dlg-caret" class="caret"></span></div>
+      <svg class="tail" viewBox="0 0 120 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M10 4 Q40 36 60 36 Q80 36 110 4 L100 44 Q74 44 60 40 Q46 44 20 44 Z" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.02)" stroke-width="1"/></svg>
+      <div class="dialog-actions" id="dlg-actions"></div>
+    </div>
+    <img id="dlg-avatar" class="dlg-avatar" src="./assets/phavatar.png" alt="avatar" />
+  </div>
+
+  <audio id="bgm" preload="none">
+    <source src="./assets/bgm.mp3" type="audio/mpeg">
+    <source src="https://justanassetfolder.netlify.app/bgm.mp3" type="audio/mpeg">
+  </audio>
+
+  <script src="list.js"></script>
+</body>
+</html>

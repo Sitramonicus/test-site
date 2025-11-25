@@ -6,12 +6,12 @@
       "name": "Aishaah",
       "handle": "@aishaah",
       "birthdate": "2009-11-22",
-      "strength": 54,
-      "dexterity": 54,
-      "wisdom": 54,
-      "intelligence": 54,
-      "constitution": 54,
-      "charisma": 54,
+      "strength": 15,
+      "dexterity": 12,
+      "wisdom": 10,
+      "intelligence": 13,
+      "constitution": 14,
+      "charisma": 18,
       "desc": [
         {"type": "p", "content": "A concise biography describing this character."},
         {"type": "b", "content": "Brave and curious."}
@@ -32,12 +32,12 @@
       "name": "Ethan",
       "handle": "@ethan",
       "birthdate": "2009-03-22",
-      "strength": 46,
-      "dexterity": 61,
-      "wisdom": 52,
-      "intelligence": 64,
-      "constitution": 50,
-      "charisma": 58,
+      "strength": 16,
+      "dexterity": 12,
+      "wisdom": 10,
+      "intelligence": 13,
+      "constitution": 14,
+      "charisma": 17,
       "desc": [
         {"type": "p", "content": "Ethan is pragmatic, with an eye for craft."},
         {"type": "b", "content": "Crafts meticulously."}
@@ -58,12 +58,12 @@
       "name": "Hannah",
       "handle": "@hannah",
       "birthdate": "2010-11-22",
-      "strength": 64,
-      "dexterity": 44,
-      "wisdom": 50,
-      "intelligence": 54,
-      "constitution": 60,
-      "charisma": 62,
+      "strength": 15,
+      "dexterity": 12,
+      "wisdom": 10,
+      "intelligence": 14,
+      "constitution": 13,
+      "charisma": 18,
       "desc": [
         {"type": "p", "content": "Hannah favours quiet complexity."},
         {"type": "b", "content": "Loves layered designs."}
@@ -84,6 +84,13 @@
       "id": "elweiszha",
       "name": "Elweiszha",
       "handle": "@elweiszha",
+      "birthdate": "2009-07-15",
+      "strength": 16,
+      "dexterity": 11,
+      "wisdom": 10,
+      "intelligence": 13,
+      "constitution": 14,
+      "charisma": 18,
       "desc": [
         {"type": "p", "content": "Placeholder"}
       ],
@@ -103,6 +110,13 @@
       "id": "jimuel",
       "name": "Jimuel",
       "handle": "@jimuel",
+      "birthdate": "2009-10-02",
+      "strength": 15,
+      "dexterity": 12,
+      "wisdom": 10,
+      "intelligence": 13,
+      "constitution": 14,
+      "charisma": 18,
       "desc": [
         {"type": "p", "content": "Placeholder"}
       ],
@@ -122,6 +136,13 @@
       "id": "kyle",
       "name": "Kyle",
       "handle": "@kyle",
+      "birthdate": "2009-01-19",
+      "strength": 15,
+      "dexterity": 12,
+      "wisdom": 10,
+      "intelligence": 14,
+      "constitution": 13,
+      "charisma": 18,
       "desc": [
         {"type": "p", "content": "Placeholder"}
       ],
@@ -141,6 +162,13 @@
       "id": "mary",
       "name": "Mary",
       "handle": "@mary",
+      "birthdate": "2009-05-23",
+      "strength": 16,
+      "dexterity": 12,
+      "wisdom": 10,
+      "intelligence": 13,
+      "constitution": 14,
+      "charisma": 18,
       "desc": [
         {"type": "p", "content": "Placeholder"}
       ],
@@ -189,7 +217,7 @@
         }
       },
       "rotation": {
-        "revolutionMs": 32000
+        "revolutionMs": 4000
       },
       "banner": {
         "gapPx": 12,
@@ -206,7 +234,7 @@
       "siteBgColor": "#0c0f12",
       "centerOffsetPx": -30,
       "arrowGapLeftPercent": 35,
-      "arrowGapRightPercent": 13,
+      "arrowGapRightPercent": 15,
       "arrowGapBothPercent": 85
     },
     "cards": {

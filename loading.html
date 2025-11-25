@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loading</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+  <style>
+    html,body{height:100%}
+    body{margin:0;background:linear-gradient(180deg,#0c0f12 0%,#111825 100%);display:grid;place-items:center;color:#cbd5e1;font-family:system-ui,-apple-system,Segoe UI,Roboto}
+    .wrap{display:flex;flex-direction:column;align-items:center;gap:12px}
+    .throbber{width:52px;height:52px;border-radius:50%;border:4px solid #20242a;border-top-color:#8fa1b3;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .label{font-size:14px;letter-spacing:.2px}
+    .btn{display:none;margin-top:8px;background:#1f2937;color:#e6eef6;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:8px 12px;cursor:pointer}
+    .btn:hover{transform:translateY(-2px);transition:transform .18s ease}
+  </style>
+  <script>
+    async function preload(){
+      const label=document.getElementById('label');
+      const tasks=[];
+      function setLabel(t){ label.textContent=t||''; }
+      function safe(p){ return p.catch(()=>{}); }
+      setLabel('Preloading fonts');
+      tasks.push(safe(new FontFace('Star Crush', 'url(./assets/Star Crush.ttf)').load().then(ff=>{document.fonts.add(ff)})));
+      setLabel('Probing assets');
+      tasks.push(safe(fetch('asset.json')));
+      tasks.push(safe(fetch('data.json')));
+      setLabel('Warming audio');
+      tasks.push(new Promise(res=>{ const a=new Audio('./assets/bgm.mp3'); a.preload='auto'; a.addEventListener('canplaythrough',()=>res(),{once:true}); a.addEventListener('error',()=>res(),{once:true}); try{ a.load(); }catch{} setTimeout(()=>res(),1800); }));
+      await Promise.allSettled(tasks);
+      setLabel('Loading complete — tap to continue');
+      const btn=document.getElementById('continue'); btn.style.display='inline-block';
+      btn.addEventListener('click',()=>{
+        try{ parent.postMessage({type:'loading_done'}, location.origin); }catch{}
+      },{once:true});
+    }
+    window.addEventListener('load',preload);
+  </script>
+</head>
+<body>
+  <div class="wrap">
+    <div class="throbber"></div>
+    <div id="label" class="label"></div>
+    <button id="continue" class="btn">Continue</button>
+  </div>
+</body>
+</html>

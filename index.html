@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Game Title Screen</title>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/magic/1.1.0/magic.min.css" />
+<link rel="preconnect" href="https://justanassetfolder.netlify.app" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/magic/1.1.0/magic.min.css" media="print" onload="this.media='all'">
 <style>
     html, body, * { user-select: none; -webkit-user-select: none; -ms-user-select: none; -moz-user-select: none; -webkit-tap-highlight-color: transparent; }
     body {
@@ -148,12 +149,13 @@
     /* animate.css duration control */
     .animated-2s{--animate-duration:2s}
     .captcha{display:none;width:160px;height:auto;image-rendering:auto}
+    .loading-label{margin-top:12px;color:#cbd5e1;font-size:14px;letter-spacing:.2px}
 </style>
 </head>
 
 <body>
 
-<div id="loadingOverlay"><div class="throbber"></div><img id="captchaImg" class="captcha" alt="captcha" /></div>
+<iframe id="loadingFrame" title="Loading" src="./loading.html" style="position:fixed;inset:0;border:0;z-index:1000"></iframe>
 
 <video id="bgVideo" class="bg-video" src="./assets/loop.mp4" autoplay muted loop playsinline preload="auto"></video>
 
@@ -166,9 +168,9 @@
   </div>
 </div>
 
-<!-- ⭐ YOUR AUDIO ADDED HERE ⭐ -->
-<audio id="bgm" autoplay loop preload="auto">
-    Uw browser staat geen audio toe.
+<audio id="bgm" autoplay loop preload="none">
+  <source src="./assets/bgm.mp3" type="audio/mpeg">
+  <source src="https://justanassetfolder.netlify.app/bgm.mp3" type="audio/mpeg">
 </audio>
 
 <!-- Audio controls -->
@@ -181,22 +183,31 @@
 const bgm = document.getElementById("bgm");
 const muteBtn = document.getElementById("muteBtn");
 const volumeSlider = document.getElementById("volumeSlider");
-const bgVideo=document.getElementById('bgVideo');
-const banner=document.getElementById('banner');
-const startBtn=document.getElementById('startBtn');
-const creditsBtn=document.getElementById('creditsBtn');
+  const bgVideo=document.getElementById('bgVideo');
+  const banner=document.getElementById('banner');
+  const startBtn=document.getElementById('startBtn');
+  const creditsBtn=document.getElementById('creditsBtn');
 
 let audioBase=0.1;
 let preloadComplete=false; let preloadPromise=null;
 const loadingOverlay=document.getElementById('loadingOverlay');
 const captchaImg=document.getElementById('captchaImg');
+const loadingLabel=document.getElementById('loadingLabel');
 
-let audioStarted = false;
+  let audioStarted = false;
+  function logAssetIssue(t,u,i){ try{ const k='assetErrors'; const a=JSON.parse(localStorage.getItem(k)||'[]'); a.push({t,u,i,ts:Date.now()}); localStorage.setItem(k, JSON.stringify(a)); }catch{} }
+  window.addEventListener('error',function(e){ const t=e&&e.target; try{ if(t && (t.src||t.href)){ logAssetIssue('error', t.src||t.href, 'resource_error'); } }catch{} }, true);
 
+function setLoading(label){ if(loadingLabel){ loadingLabel.textContent=label||''; } }
+function ensureBgmFallback(cdnSrc){
+  setTimeout(()=>{
+    if(bgm.readyState===0 && cdnSrc){ bgm.src=cdnSrc; bgm.load(); }
+  }, 600);
+}
 fetch('asset.json').then(r=>r.json()).then(a=>{
     const title=a&&a.title||{};
   if(title.audioBaseVolume!=null){ audioBase = Number(title.audioBaseVolume)||0.1; }
-  if(title.bgm){ bgm.src = title.bgm; }
+  if(title.bgm){ ensureBgmFallback(title.bgm); }
   if(title.bgVideo){ bgVideo.src = title.bgVideo; }
   if(title.bannerOpacity!=null){ banner.style.background = `rgba(255,255,255,${Number(title.bannerOpacity)})`; }
   const v = (parseFloat(volumeSlider.value)||0.5) * audioBase;
@@ -209,13 +220,16 @@ fetch('asset.json').then(r=>r.json()).then(a=>{
 }).catch(()=>{});
 bgm.addEventListener('loadedmetadata',()=>{ bgm.volume=(parseFloat(volumeSlider.value)||0.5)*audioBase; });
   bgm.addEventListener('play',()=>{ bgm.volume=(parseFloat(volumeSlider.value)||0.5)*audioBase; });
+  let audioRefreshed=false;
+  function refreshAudioOnce(){ if(audioRefreshed) return; audioRefreshed=true; const wasMuted=bgm.muted; try{ bgm.muted=true; setTimeout(()=>{ try{ bgm.muted=wasMuted; }catch{} }, 120); }catch{} }
+  bgm.addEventListener('playing', refreshAudioOnce);
   function ensureBgmStarts(){
     bgm.play().then(()=>{ audioStarted=true; }).catch(()=>{
       bgm.muted=true;
       bgm.play().then(()=>{ audioStarted=true; try{ bgm.muted=false; }catch{} }).catch(()=>{});
     });
   }
-  document.addEventListener('DOMContentLoaded', ensureBgmStarts);
+  
 
 function startAudioOnce() {
     if (!audioStarted) {
@@ -266,21 +280,29 @@ volumeSlider.addEventListener("input", () => {
 function preloadAssets(){
   if(preloadPromise) return preloadPromise;
   const tasks=[];
+  setLoading('Font');
   tasks.push(new Promise(resolve=>{
     const f=new FontFace('Star Crush', 'url(./assets/Star Crush.ttf)');
     f.load().then(ff=>{document.fonts.add(ff); resolve();}).catch(()=>resolve());
   }));
+  setLoading('Video');
   tasks.push(new Promise(resolve=>{
     if(!bgVideo) return resolve();
     if(bgVideo.readyState>=3) return resolve();
-    const onLoaded=()=>{bgVideo.removeEventListener('loadeddata', onLoaded); resolve();};
+    let done=false; const finish=()=>{ if(done) return; done=true; resolve(); };
+    const onLoaded=()=>{ bgVideo.removeEventListener('loadeddata', onLoaded); bgVideo.removeEventListener('error', onError); finish(); };
+    const onError=()=>{ logAssetIssue('error', bgVideo.currentSrc||bgVideo.src, 'video_error'); bgVideo.removeEventListener('loadeddata', onLoaded); finish(); };
     bgVideo.addEventListener('loadeddata', onLoaded);
+    bgVideo.addEventListener('error', onError);
     bgVideo.load();
+    setTimeout(()=>{ if(!done){ logAssetIssue('timeout', bgVideo.currentSrc||bgVideo.src, 'video_timeout'); finish(); } }, 6000);
   }));
-  tasks.push(new Promise(resolve=>{ const a=new Audio(); a.src=bgm.src||''; a.preload='auto'; a.addEventListener('canplaythrough',()=>resolve(),{once:true}); a.addEventListener('error',()=>resolve(),{once:true}); a.load(); }));
+  setLoading('Audio');
+  tasks.push(new Promise(resolve=>{ const a=new Audio(); a.src=bgm.src||''; a.preload='auto'; let done=false; const finish=()=>{ if(done) return; done=true; resolve(); }; a.addEventListener('canplaythrough',finish,{once:true}); a.addEventListener('error',()=>{ logAssetIssue('error', a.src||'', 'audio_error'); finish(); },{once:true}); a.load(); setTimeout(()=>finish(),6000); }));
   tasks.push(new Promise(res=>{ document.fonts&&document.fonts.ready?document.fonts.ready.then(()=>res()).catch(()=>res()):res(); }));
-  tasks.push(new Promise(resolve=>{ const link=document.querySelector('link[href*="animate.min.css"]'); if(!link) return resolve(); if(link.sheet) return resolve(); link.addEventListener('load',()=>resolve(),{once:true}); link.addEventListener('error',()=>resolve(),{once:true}); }));
-  tasks.push(new Promise(resolve=>{ if(!bgm) return resolve(); if(bgm.readyState>=3) return resolve(); const onReady=()=>{ bgm.removeEventListener('canplaythrough', onReady); resolve(); }; bgm.addEventListener('canplaythrough', onReady, {once:true}); bgm.load&&bgm.load(); }));
+  setLoading('Styles');
+  tasks.push(new Promise(resolve=>{ const link=document.querySelector('link[href*="animate.min.css"]'); if(!link) return resolve(); if(link.sheet) return resolve(); let done=false; const finish=()=>{ if(done) return; done=true; resolve(); }; link.addEventListener('load',finish,{once:true}); link.addEventListener('error',()=>{ logAssetIssue('error', String(link.href||''), 'css_error'); finish(); },{once:true}); setTimeout(()=>{ if(!done){ logAssetIssue('timeout', String(link.href||''), 'css_timeout'); finish(); } },6000); }));
+  tasks.push(new Promise(resolve=>{ if(!bgm) return resolve(); if(bgm.readyState>=3) return resolve(); let done=false; const finish=()=>{ if(done) return; done=true; resolve(); }; const onReady=()=>{ bgm.removeEventListener('canplaythrough', onReady); bgm.removeEventListener('error', onErr); finish(); }; const onErr=()=>{ logAssetIssue('error', bgm.src||'', 'audio_error'); bgm.removeEventListener('canplaythrough', onReady); finish(); }; bgm.addEventListener('canplaythrough', onReady, {once:true}); bgm.addEventListener('error', onErr, {once:true}); bgm.load&&bgm.load(); setTimeout(()=>{ if(!done){ logAssetIssue('timeout', bgm.src||'', 'audio_timeout'); finish(); } },6000); }));
   tasks.push(fetch('asset.json').then(r=>r.json()).then(a=>{
     const urls=[];
     const pushUrl=(u)=>{ if(u && typeof u==='string'){ urls.push(u); } };
@@ -288,10 +310,10 @@ function preloadAssets(){
     pushUrl(rev.defaultBg); const sounds=rev.sounds||{}; Object.values(sounds).forEach(pushUrl);
     const icons=(rev.modeIcons||{}); Object.values(icons).forEach(pushUrl);
     const title=a.title||{}; pushUrl(title.bgm); pushUrl(title.bgVideo);
-    const imgPromises=urls.filter(u=>u.endsWith('.png')||u.endsWith('.jpg')||u.endsWith('.jpeg')||u.includes('picsum')).map(u=>new Promise(res=>{ const img=new Image(); img.onload=()=>res(); img.onerror=()=>res(); img.src=u; }));
-    const audioPromises=urls.filter(u=>u.endsWith('.mp3')||u.endsWith('.wav')||u.endsWith('.ogg')).map(u=>new Promise(res=>{ const aa=new Audio(); aa.src=u; aa.preload='auto'; aa.addEventListener('canplaythrough',()=>res(),{once:true}); aa.addEventListener('error',()=>res(),{once:true}); aa.load(); }));
+    const imgPromises=urls.filter(u=>u.endsWith('.png')||u.endsWith('.jpg')||u.endsWith('.jpeg')||u.includes('picsum')).map(u=>new Promise(res=>{ const img=new Image(); let done=false; const finish=()=>{ if(done) return; done=true; res(); }; img.onload=finish; img.onerror=()=>{ logAssetIssue('error', u, 'image_error'); finish(); }; setLoading(u); img.src=u; setTimeout(()=>finish(),6000); }));
+    const audioPromises=urls.filter(u=>u.endsWith('.mp3')||u.endsWith('.wav')||u.endsWith('.ogg')).map(u=>new Promise(res=>{ const aa=new Audio(); aa.src=u; aa.preload='auto'; let done=false; const finish=()=>{ if(done) return; done=true; res(); }; aa.addEventListener('canplaythrough',finish,{once:true}); aa.addEventListener('error',()=>{ logAssetIssue('error', u, 'audio_error'); finish(); },{once:true}); setLoading(u); aa.load(); setTimeout(()=>finish(),6000); }));
     return Promise.allSettled([...imgPromises, ...audioPromises]);
-  }).catch(()=>{}));
+  }).catch(()=>{ logAssetIssue('error', 'asset.json', 'fetch_error'); }));
   preloadPromise=Promise.allSettled(tasks).then(()=>{preloadComplete=true});
   return preloadPromise;
 }
@@ -366,37 +388,35 @@ creditsBtn.addEventListener('click',()=>{
   document.body.appendChild(overlay);
 });
 
-preloadAssets().then(()=>{ loadingOverlay.classList.add('hidden'); });
-
-// Captcha stage after preload
-preloadAssets().then(()=>{
-  const th=document.querySelector('#loadingOverlay .throbber');
-  if(th){ th.style.display='none'; }
-  if(captchaImg){ captchaImg.style.display='block'; }
-  captchaStageActive=true;
-});
-
-// Handle captcha click flow
-document.addEventListener('click', async()=>{
-  if(!captchaStageActive) return;
+window.addEventListener('message',function(e){
   try{
-    if(captchaImg){
-      captchaImg.classList.remove('magictime','spaceOutUp');
-      captchaImg.offsetHeight;
-      captchaImg.classList.add('magictime','spaceOutUp');
-      await new Promise(res=>{ captchaImg.addEventListener('animationend',()=>res(),{once:true}); });
-    }
-    if(bgVideo){
-      bgVideo.classList.remove('magictime','perspectiveUp');
-      bgVideo.offsetHeight;
-      bgVideo.classList.add('magictime','perspectiveUp');
-      await new Promise(res=>{ bgVideo.addEventListener('animationend',()=>res(),{once:true}); });
+    if(e.origin!==location.origin) return;
+    if(e.data&&e.data.type==='loading_done'){
+      const frame=document.getElementById('loadingFrame'); if(frame){ frame.style.display='none'; }
+      readyToStartAudio=true;
+      startAudioOnce();
+      try{ sessionStorage.setItem('startDialogue','pending'); }catch{}
     }
   }catch{}
-  readyToStartAudio=true;
-  startAudioOnce();
-  captchaStageActive=false;
-  loadingOverlay.classList.add('hidden');
+});
+
+try{
+  window.addEventListener('load',()=>{
+    try{
+      const ok = (location.protocol==='https:')|| location.hostname==='localhost' || location.hostname==='127.0.0.1';
+      if(ok && window.top===window && 'serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js'); }
+    }catch{}
+  });
+}catch{}
+
+document.addEventListener('keydown',function(e){
+  try{
+    if(e.ctrlKey && e.altKey && e.shiftKey && e.code==='Digit9'){
+      e.preventDefault();
+      const w=window.open('./assetCheck.html','_blank');
+      if(!w){ window.location.href='./assetCheck.html'; }
+    }
+  }catch{}
 });
 
 

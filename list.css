@@ -1,0 +1,39 @@
+html,body{height:100%}
+body{margin:0;background:#0c0f12;color:#fff;overflow:hidden}
+.catalog{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--card-w),1fr));gap:22px;padding:20px;position:absolute;top:calc(50% - (var(--card-h)/2) + 20px + var(--center-offset));left:50%;transform:translateX(-50%);width:min(1100px,92vw);z-index:2}
+.catalog .card{position:relative;width:var(--card-w);height:var(--card-h);border-radius:var(--radius);overflow:hidden;background:#111;box-shadow:0 12px 30px rgba(0,0,0,.45);transition:transform .35s ease, filter .35s ease, opacity .35s ease, outline-color .18s ease, outline-width .18s ease}
+.catalog .card::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--hl),transparent);animation:scanline var(--scanline-dur) linear infinite;pointer-events:none;box-shadow:0 0 10px rgba(126,200,255,.5)}
+.catalog .card::after{content:"";position:absolute;inset:auto 0 0 0;height:40%;background:linear-gradient(to top,rgba(0,0,0,.7),rgba(0,0,0,0));pointer-events:none;transform:translateY(20px)}
+.catalog .card .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(1.05) contrast(1.02);pointer-events:none;user-select:none}
+.catalog .card .avatar{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:72%;height:auto;object-fit:contain;user-select:none;-webkit-user-drag:none;pointer-events:none}
+.catalog .card .text{position:absolute;left:16px;bottom:16px;display:flex;flex-direction:column;gap:4px;z-index:2}
+.catalog .card .name{font-weight:700;font-size:1.15rem;letter-spacing:.2px;user-select:none}
+.catalog .card .handle{opacity:.7;font-size:.95rem}
+.catalog .card:hover{transform:translateY(-2px) scale(1.03);outline:2px solid var(--hl)}
+.dialogue-overlay{position:fixed;inset:0;display:none;align-items:flex-end;justify-content:flex-end;padding:24px;z-index:120}
+.dialogue-overlay.show{display:flex}
+.dialogue-overlay::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center, rgba(0,0,0,0.55), rgba(0,0,0,0.85)), linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 84%)}
+.dialogue-panel{position:relative;padding:20px;border-radius:22px;background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.08));border:1px solid rgba(255,255,255,0.04);backdrop-filter: blur(6px) saturate(120%);box-shadow:0 12px 40px rgba(2,6,23,0.6);clip-path: polygon(0 0, calc(100% - 30px) 0, 100% 18%, 100% 78%, calc(100% - 24px) 100%, 8% 100%, 0 86%);
+  min-width:min(680px, 94vw);max-width:min(900px,94vw)}
+.dialogue-panel .dialog-head{display:flex;gap:12px;align-items:center;margin-bottom:8px}
+.dialogue-panel .npc-name{font-weight:700;letter-spacing:.2px}
+.dialogue-panel .mood{font-size:.78rem;color:#a9b6c3;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,0.02)}
+.dialogue-panel .dialog-body{font-size:.98rem;line-height:1.36;color:#e6eef6;min-height:64px;max-height:220px;overflow:auto;padding-right:6px}
+.dialogue-panel .type{white-space:pre-wrap;word-break:break-word}
+.dialogue-panel .tail{position:absolute;left:56px;bottom:-36px;width:96px;height:48px;filter:drop-shadow(0 6px 14px rgba(0,0,0,0.45))}
+.dialogue-panel .dialog-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.dialogue-panel .choice{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));color:#e6eef6;border:1px solid rgba(255,255,255,0.04);padding:8px 12px;border-radius:999px;font-size:.92rem;cursor:pointer;transition:transform .14s ease, box-shadow .14s ease}
+.dialogue-panel .choice:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(0,0,0,0.45)}
+.caret{display:inline-block;width:8px;height:14px;margin-left:4px;background:linear-gradient(180deg,#e6eef6,#cfe9ff);border-radius:2px;opacity:.95;animation:blink 1s steps(1) infinite}
+@keyframes blink{ 50%{opacity:0} }
+.dlg-avatar{width:110px;height:110px;border-radius:14px;object-fit:cover;box-shadow:0 8px 22px rgba(0,0,0,0.6)}
+.dialogue-overlay.prelude .dialogue-panel{box-shadow:0 18px 60px rgba(255,255,255,0.28)}
+.dialogue-overlay.prelude .dialogue-panel .dialog-body{font-size:1.25rem}
+
+/* Modal overlay for character sheet (reuse revolve styles) */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:grid;place-items:center;z-index:100}
+.overlay.hidden{display:none}
+.sheet-modal{position:relative;width:min(900px, 96vw);height:min(680px, 92vh);background:#0e1216;border-radius:12px;box-shadow:0 18px 40px rgba(0,0,0,.6);overflow:hidden;display:grid}
+.sheet-modal .close{position:absolute;top:10px;right:10px;border:none;background:rgba(255,255,255,.15);color:#fff;border-radius:999px;width:36px;height:36px;cursor:pointer;font-size:22px}
+#sheet-frame{border:0;width:100%;height:100%;background:#111}
+.page.modal-blur .stage{filter:blur(4px) brightness(.6)}

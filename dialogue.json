@@ -1,0 +1,51 @@
+{
+  "settings": {
+    "position": "bottom-right",
+    "theme": {
+      "accent": "#7ec8ff"
+    }
+  },
+  "prelude": [
+    { "name": "Guide", "text": "hey!" },
+    { "name": "Guide", "text": "hey, you!" },
+    { "name": "Guide", "text": "over here!" }
+  ],
+  "start": {
+    "lines": [
+      { "name": "Guide", "text": "Welcome in!" },
+      { "name": "Guide", "text": "This page catalogues our characters." },
+      { "name": "Guide", "text": "Browse cards, open sheets, and check socials." }
+    ],
+    "choices": [
+      { "id": "ask_site", "label": "What's this site?" },
+      { "id": "ask_music", "label": "The music?" },
+      { "id": "ask_revolve", "label": "Switch layouts" }
+    ]
+  },
+  "nodes": {
+    "ask_site": {
+      "lines": [
+        { "name": "Guide", "text": "It collates works, achievements, and socials in a game-like shell." },
+        { "name": "Guide", "text": "Cards are the catalogue—tap one to see details." }
+      ],
+      "choices": [ { "id": "back_start", "label": "Back" } ]
+    },
+    "ask_music": {
+      "lines": [
+        { "name": "Guide", "text": "Music flows across pages. If it stops, click once to resume." },
+        { "name": "Guide", "text": "You can mute or adjust volume from the audio UI." }
+      ],
+      "choices": [ { "id": "back_start", "label": "Back" } ]
+    },
+    "ask_revolve": {
+      "lines": [
+        { "name": "Guide", "text": "Switch modes to the revolve layout using the top buttons." }
+      ],
+      "choices": [ { "id": "back_start", "label": "Back" } ]
+    },
+    "back_start": {
+      "lines": [],
+      "choices": []
+    }
+  }
+}

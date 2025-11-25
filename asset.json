@@ -20,9 +20,11 @@
     "RevolveHover": {"src": "./assets/hover.mp3", "volume": 0.025},
     "VisSwitch": {"src": "./assets/switch.mp3", "volume": 0.025},
     "SocialHover": {"src": "./assets/hover.mp3", "volume": 0.025}
+    ,
+    "BubblesAmbient": {"src": "./assets/bubbles.mp3", "volume": 0.003}
   },
   "title": {
-    "bgm": "https://files.catbox.moe/esxa3a.mp3",
+    "bgm": "https://justanassetfolder.netlify.app/bgm.mp3",
     "defaultBg": "YOUR-BACKGROUND.jpg",
     "bgVideo": "./assets/loop.mp4",
     "font": "./assets/Star Crush.ttf",

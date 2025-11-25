@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Asset Check</title>
+<style>
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:#0e1216;color:#fff}
+  .wrap{max-width:980px;margin:24px auto;padding:16px}
+  h1{font-size:22px;margin:0 0 12px 0}
+  .controls{display:flex;gap:8px;margin-bottom:12px}
+  button{background:#151a21;color:#fff;border:1px solid #2b3139;border-radius:8px;padding:8px 12px;cursor:pointer}
+  .list{display:grid;grid-template-columns:1fr 140px 160px;gap:8px;align-items:center}
+  .item{background:#12161b;border:1px solid #253040;border-radius:8px;padding:10px 12px;display:contents}
+  .cell{padding:10px 12px;background:#12161b;border:1px solid #253040}
+  .url{word-break:break-all}
+  .empty{opacity:.8}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Asset Check</h1>
+    <div class="controls">
+      <button id="refresh">Refresh</button>
+      <button id="clear">Clear</button>
+    </div>
+    <div id="summary"></div>
+    <div class="list" id="list"></div>
+  </div>
+<script>
+  const key='assetErrors';
+  function fmtTime(ts){ try{ const d=new Date(ts); return d.toLocaleString(); }catch{ return String(ts||''); } }
+  function byUrl(arr){ const m={}; arr.forEach(x=>{ const u=String(x.u||''); if(!m[u]) m[u]=[]; m[u].push(x); }); return m; }
+  function render(){ const list=document.getElementById('list'); const sum=document.getElementById('summary'); list.innerHTML=''; const arr=JSON.parse(localStorage.getItem(key)||'[]'); if(!arr.length){ sum.textContent='No failures recorded'; sum.className='empty'; return; } sum.textContent=`Failures: ${arr.length}`; sum.className=''; const grouped=byUrl(arr); Object.keys(grouped).forEach(u=>{ const items=grouped[u]; items.forEach(x=>{ const url=document.createElement('div'); url.className='cell url'; url.textContent=u||'(unknown)'; const reason=document.createElement('div'); reason.className='cell'; reason.textContent=String(x.i||x.t||''); const time=document.createElement('div'); time.className='cell'; time.textContent=fmtTime(x.ts); list.appendChild(url); list.appendChild(reason); list.appendChild(time); }); }); }
+  document.getElementById('refresh').addEventListener('click',render);
+  document.getElementById('clear').addEventListener('click',()=>{ try{ localStorage.removeItem(key); }catch{} render(); });
+  render();
+</script>
+</body>
+</html>
